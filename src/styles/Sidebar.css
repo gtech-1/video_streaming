@@ -1,0 +1,108 @@
+/* Sidebar Container */
+.sidebar {
+    background-color: #333;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: auto;
+    min-width: 50px; /* Minimum width to fit icons */
+    padding: 10px;
+    transition: width 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* When Sidebar is Hidden */
+.sidebar.hidden {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Sidebar Toggle Button (Outside Sidebar) */
+.sidebar-toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 10px;
+    background: #444;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #555;
+}
+
+/* Sidebar Toggle Button (Inside Sidebar) */
+.sidebar-toggle {
+    background: #444;
+    color: white;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.sidebar-toggle:hover {
+    background: #555;
+}
+
+/* Sidebar Navigation */
+.sidebar nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Sidebar Links */
+.sidebar nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease-in-out;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.sidebar nav ul li a:hover {
+    background-color: #555;
+}
+
+/* Sidebar Icons */
+.icon {
+    margin-right: 10px;
+}
+
+/* Fully Hidden Sidebar */
+.sidebar.hidden nav ul {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: auto;
+        min-width: 40px;
+    }
+
+    .sidebar.hidden {
+        width: 0;
+    }
+}
