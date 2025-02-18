@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Bell, ChevronDown, Globe, Search, User } from "lucide-react";
+import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "../assets/logo.png";
 
 // Custom hook to handle outside clicks
 const useOutsideClick = (ref, callback) => {
@@ -17,7 +18,7 @@ const useOutsideClick = (ref, callback) => {
   }, [ref, callback]);
 };
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -34,108 +35,123 @@ const Navbar = () => {
   useOutsideClick(searchRef, () => setIsSearchOpen(false));
 
   return (
-    <nav className="fixed w-full top-0 z-10 bg-white shadow-sm text-gray-800 px-4 sm:px-6 py-3 flex items-center justify-between">
-      {/* Placeholder for left-side (if needed) */}
-      <div className="w-16 sm:w-20"></div>
+    <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+      {/* Left Side: Hamburger Toggle and Logo */}
+      <div className="flex items-center">
+        <button onClick={toggleSidebar} className="text-white mr-3 flex items-center">
+          <Menu size={20} />
+        </button>
+        <img src={logo} alt="Logo" className="h-10" />
+      </div>
 
-      {/* Right-side Navbar Items */}
-      <div className="flex items-center space-x-4 sm:space-x-6 ml-auto w-full justify-end">
-        {/* Search */}
-        <div className="relative flex items-center" ref={searchRef}>
-          {/* Mobile Search */}
-          <div className="sm:hidden">
-            {isSearchOpen ? (
-              <motion.input
-                type="text"
-                placeholder="Search"
-                className="w-40 max-w-xs py-2 pl-10 pr-4 bg-gray-200 text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
-                initial={{ width: 40 }}
-                animate={{ width: 160 }}
-                transition={{ duration: 0.4 }}
-              />
-            ) : (
-              <button onClick={() => setIsSearchOpen(true)} className="sm:hidden">
-                <Search className="text-gray-800" size={18} />
-              </button>
-            )}
-          </div>
+      {/* Right Side Navbar Items */}
+      <div className="flex items-center space-x-4 sm:space-x-6 ml-auto relative w-full justify-end">
+        {/* Desktop Search */}
+        <div className="hidden sm:flex items-center">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-56 md:w-64 lg:w-72 xl:w-80 py-1.5 pl-8 pr-3 bg-gray-200 text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border border-gray-300 hover:bg-gray-300"
+          />
+        </div>
 
-          {/* Desktop Search */}
-          <div className="hidden sm:flex items-center">
+        {/* Mobile Search */}
+        {isSearchOpen ? (
+          <motion.div
+            ref={searchRef}
+            initial={{ width: "50px", opacity: 0 }}
+            animate={{ width: "calc(100% - 80px)", opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 rounded-lg px-4 py-2 shadow-md flex items-center sm:hidden"
+            style={{ maxWidth: "600px" }}
+          >
+            <Search className="text-gray-600 mr-2" size={18} />
             <input
               type="text"
               placeholder="Search"
-              className="w-56 md:w-64 lg:w-72 xl:w-80 py-1.5 pl-8 pr-3 bg-gray-200 text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border border-gray-300 hover:bg-gray-300"
+              className="w-full bg-transparent focus:outline-none"
+              autoFocus
             />
+            <button onClick={() => setIsSearchOpen(false)}>
+              <X className="text-gray-600" size={20} />
+            </button>
+          </motion.div>
+        ) : (
+          <button onClick={() => setIsSearchOpen(true)} className="sm:hidden flex items-center justify-center">
+            <Search size={18} />
+          </button>
+        )}
+
+        {/* Other Icons (Hidden on Mobile When Search is Open) */}
+        {!isSearchOpen && (
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <div className="relative" ref={notifRef}>
+              <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="relative flex items-center justify-center">
+                <Bell className="hover:text-gray-400 transition-all" size={20} />
+                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+              {isNotifOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-64 bg-white text-gray-800 border rounded-lg shadow-lg p-4"
+                >
+                  <p className="text-sm">No new notifications</p>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Language Selector */}
+            <div className="relative" ref={langRef}>
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center space-x-1 hover:text-gray-400 transition-all"
+              >
+                <Globe size={20} />
+                <ChevronDown size={14} />
+              </button>
+              {isLangOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-48 bg-white text-gray-900 border rounded-lg shadow-lg"
+                >
+                  <ul className="p-2">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">English</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Hindi</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">French</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Spanish</li>
+                  </ul>
+                </motion.div>
+              )}
+            </div>
+
+            {/* User Profile */}
+            <div className="relative" ref={userRef}>
+              <button onClick={() => setIsUserOpen(!isUserOpen)} className="flex items-center space-x-2">
+                <User className="hover:text-gray-400 transition-all" size={22} />
+              </button>
+              {isUserOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-56 bg-white text-gray-900 border rounded-lg shadow-lg"
+                >
+                  <ul className="p-2">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Dashboard</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Logout</li>
+                  </ul>
+                </motion.div>
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* Notifications */}
-        <div className="relative flex items-center" ref={notifRef}>
-          <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="relative">
-            <Bell className="text-gray-800 hover:text-gray-600 transition-all" size={20} />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
-          {isNotifOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute right-0 mt-3 w-48 sm:w-64 bg-white text-gray-800 border rounded-lg shadow-lg p-4"
-              style={{ top: "100%" }}
-            >
-              <p className="text-sm">No new notifications</p>
-            </motion.div>
-          )}
-        </div>
-
-        {/* Language Selector */}
-        <div className="relative" ref={langRef}>
-          <button
-            onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center space-x-1 text-gray-800 hover:text-gray-600 transition-all"
-          >
-            <Globe size={20} />
-            <ChevronDown size={14} />
-          </button>
-          {isLangOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute right-0 mt-3 w-40 sm:w-48 bg-white text-gray-800 border rounded-lg shadow-lg"
-            >
-              <ul className="p-2">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">English</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Hindi</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">French</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Spanish</li>
-              </ul>
-            </motion.div>
-          )}
-        </div>
-
-        {/* User Profile */}
-        <div className="relative" ref={userRef}>
-          <button onClick={() => setIsUserOpen(!isUserOpen)} className="flex items-center space-x-2">
-            <User className="text-gray-800 hover:text-gray-600 transition-all" size={22} />
-          </button>
-          {isUserOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute right-0 mt-3 w-48 sm:w-56 bg-white text-gray-800 border rounded-lg shadow-lg"
-            >
-              <ul className="p-2">
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Profile</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Dashboard</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Settings</li>
-                <li className="px-4 py-2 hover:bg-gray-200 cursor-pointer">Logout</li>
-              </ul>
-            </motion.div>
-          )}
-        </div>
+        )}
       </div>
     </nav>
   );
