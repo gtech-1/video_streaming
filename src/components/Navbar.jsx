@@ -1,9 +1,10 @@
+import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
 
-// Custom hook to handle outside clicks
+// Custom hook for outside clicks
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
