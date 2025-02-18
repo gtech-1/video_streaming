@@ -1,9 +1,10 @@
+import React from "react";
 import { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
 
-// Custom hook to handle outside clicks
+// Custom hook for outside clicks
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,7 +19,7 @@ const useOutsideClick = (ref, callback) => {
   }, [ref, callback]);
 };
 
-const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
+const Navbar = ({ toggleSidebar }) => {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -34,15 +35,11 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   useOutsideClick(userRef, () => setIsUserOpen(false));
   useOutsideClick(searchRef, () => setIsSearchOpen(false));
 
-  const handleHamburgerClick = () => {
-    toggleSidebar();  // Close the sidebar if it's already open
-  };
-
   return (
     <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-3 flex items-center justify-between">
       {/* Left Side: Hamburger Toggle and Logo */}
       <div className="flex items-center">
-        <button onClick={handleHamburgerClick} className="text-white mr-3 flex items-center">
+        <button onClick={toggleSidebar} className="text-white mr-3 flex items-center">
           <Menu size={20} />
         </button>
         <img src={logo} alt="Logo" className="h-10" />
@@ -51,16 +48,13 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
       {/* Right Side Navbar Items */}
       <div className="flex items-center space-x-4 sm:space-x-6 ml-auto relative w-full justify-end">
         {/* Desktop Search */}
-        {!isSearchOpen && (
-          <div className="hidden sm:flex items-center bg-gray-800 text-gray-100 rounded-full px-4 py-2 shadow-lg w-[400px] transition-all duration-300 ease-in-out hover:scale-105">
-            <Search className="text-gray-400 mr-3" size={18} />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400 rounded-md py-2"
-            />
-          </div>
-        )}
+        <div className="hidden sm:flex items-center">
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-56 md:w-64 lg:w-72 xl:w-80 py-1.5 pl-8 pr-3 bg-gray-200 text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border border-gray-300 hover:bg-gray-300"
+          />
+        </div>
 
         {/* Mobile Search */}
         {isSearchOpen ? (
@@ -69,18 +63,18 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
             initial={{ width: "50px", opacity: 0 }}
             animate={{ width: "calc(100% - 80px)", opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-gray-100 rounded-md px-4 py-2 shadow-lg flex items-center sm:hidden"
+            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 rounded-lg px-4 py-2 shadow-md flex items-center sm:hidden"
             style={{ maxWidth: "600px" }}
           >
-            <Search className="text-gray-400 mr-2" size={18} />
+            <Search className="text-gray-600 mr-2" size={18} />
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400"
+              className="w-full bg-transparent focus:outline-none"
               autoFocus
             />
             <button onClick={() => setIsSearchOpen(false)}>
-              <X className="text-gray-400" size={20} />
+              <X className="text-gray-600" size={20} />
             </button>
           </motion.div>
         ) : (
