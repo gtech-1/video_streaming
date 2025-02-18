@@ -1,16 +1,19 @@
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import React, { useState } from "react";
+import Sidebar from "../components/Sidebar"; // Update the path to Sidebar if necessary
+import Navbar from "../components/Navbar"; // Update the path to Navbar if necessary
 
 const Home = () => {
-  return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* Fixed Navbar (it will appear behind the sidebar) */}
-      <Navbar />
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-      {/* Sidebar is fixed at 0,0 so it doesn't affect layout */}
-      <div className="flex">
-        <Sidebar />
-      </div>
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prevState) => !prevState);
+  };
+
+  return (
+    <div>
+      <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      {/* Other content of your Home page */}
     </div>
   );
 };
