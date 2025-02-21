@@ -7,13 +7,14 @@ const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
+    setIsSidebarOpen((prevState) => !prevState);
   };
+
 
   return (
     <div className="bg-gray-100 min-h-screen pt-16 flex">
-      <Navbar toggleSidebar={toggleSidebar} />
-      <Sidebar isSidebarOpen={isSidebarOpen} />
+      <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       <div className={`flex-1 transition-all ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
         <Dashboard />
       </div>
@@ -22,5 +23,4 @@ const Home = () => {
 };
 
 export default Home;
-
 
