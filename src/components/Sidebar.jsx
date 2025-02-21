@@ -4,11 +4,6 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
 import { IoMdListBox } from "react-icons/io";
 import { motion } from "framer-motion";
-import { LuUsers } from "react-icons/lu";
-import { FaBuildingUser } from "react-icons/fa6";
-import { FaIdBadge } from "react-icons/fa";
-import { MdNoAccounts } from "react-icons/md";
-import { MdManageAccounts } from "react-icons/md";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
@@ -35,12 +30,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   return (
     <motion.div
       ref={sidebarRef}
-      initial={{ width: isSidebarOpen ? 250 : 60 }}
-      animate={{ width: isSidebarOpen ? 250 : 60 }}
+      initial={{ width: isSidebarOpen ? 200 : 60 }}
+      animate={{ width: isSidebarOpen ? 200 : 60 }}
       transition={{ type: "spring", stiffness: 250, damping: 25 }}
       // Added h-[calc(100vh-56px)] to occupy full height minus the navbar, 
       // and conditionally hide on mobile when closed.
-      className={`fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50  ${
+      className={`fixed top-[56px] left-0 bg-gray-900 text-white pb-3 z-50 h-[calc(100vh-56px)] ${
         !isSidebarOpen ? "hidden sm:flex" : "flex"
       } flex-col`}
     >
@@ -49,8 +44,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           <NavItem icon={<FaHome size={18} />} text="Home" isSidebarOpen={isSidebarOpen} />
           <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} />
           <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} />
-          <NavItem icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} />
-          
+          <NavItem icon={<FaUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} />
 
           {/* User Management */}
           <DropdownItem
@@ -72,20 +66,20 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
               <SubNavItem text="Edit Email" />
               <SubNavItem text="Edit Role" />
             </DropdownItem>
-            <SubNavItem icon={<FaUserMinus size={14} />} text="Delete User" />
+            <SubNavItem icon={<FaUserMinus size={14} />} text="Delete Users" />
           </DropdownItem>
 
           {/* Roles Management */}
           <DropdownItem
-            icon={<FaBuildingUser size={16} />}
+            icon={<FaUserEdit size={16} />}
             text="Roles Mgmt"
             isSidebarOpen={isSidebarOpen}
             isOpen={rolesMgmtOpen}
             toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}
           >
-            <SubNavItem icon={<MdManageAccounts size={15}/>}  text="Update Roles"/>
-            <SubNavItem icon={<MdNoAccounts size={15}/>}  text="Remove Roles" />
-            <SubNavItem icon={<FaIdBadge size={15}/>}   text="Assign Roles" />
+            <SubNavItem text="Update Roles" />
+            <SubNavItem text="Remove Roles" />
+            <SubNavItem text="Assign Roles" />
           </DropdownItem>
         </nav>
       </div>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
+
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
@@ -19,8 +19,6 @@ const useOutsideClick = (ref, callback) => {
 };
 
 const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
-  const navigate = useNavigate(); 
-
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -40,11 +38,6 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     toggleSidebar();
   };
 
-   const handleLogout =()=>{
-    localStorage.removeItem("user");
-    navigate("/");
-   }
-
   return (
     <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-2 flex items-center justify-between">
       {/* Left Side: Hamburger Toggle and Logo */}
@@ -52,7 +45,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         <button onClick={handleHamburgerClick} className="text-white mr-3 flex items-center">
           {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <img src={logo} alt="Logo" className="h-10 mt-1 ml-1" />
+        <img src={logo} alt="Logo" className="h-10" />
       </div>
 
       {/* Right Side Navbar Items */}
@@ -159,7 +152,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Dashboard</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Logout</li>
                   </ul>
                 </motion.div>
               )}
