@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar"; // Update the path to Sidebar if ne
 import Navbar from "../components/Navbar"; // Update the path to Navbar if necessary
 
 const Home = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);

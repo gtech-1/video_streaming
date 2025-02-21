@@ -1,163 +1,136 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
 import { IoMdListBox } from "react-icons/io";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
   const [rolesMgmtOpen, setRolesMgmtOpen] = useState(false);
   const [editUserOpen, setEditUserOpen] = useState(false);
-
   const sidebarRef = useRef(null);
 
-  // Close sidebar if clicked outside
+  // Detect clicks outside the sidebar and close it
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-        toggleSidebar(); // Close the sidebar when clicking outside
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        isSidebarOpen
+      ) {
+        toggleSidebar();
       }
     };
-
-    if (isSidebarOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSidebarOpen, toggleSidebar]);
 
   return (
-    <AnimatePresence>
-      {isSidebarOpen && (
-        <motion.div
-          ref={sidebarRef}
-          key="sidebar"
-          initial={{ x: -300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -300, opacity: 0 }}
-          transition={{ type: "tween", duration: 0.3 }}
-          className="fixed top-16 left-0 w-64 bg-gray-900 text-white h-[calc(100vh-64px)] pb-4 px-4 flex flex-col z-50"
-        >
-          <div className="overflow-y-auto flex-1 mt-2">
-            <nav className="space-y-1">
-              <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                <FaHome className="mr-3" /> Home
-              </a>
-              <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                <HiOutlineViewGrid className="mr-3" /> Dashboard
-              </a>
-              <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                <IoMdListBox className="mr-3" /> Menu Page
-              </a>
-              <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                <FaUsers className="mr-3" /> User List
-              </a>
+    <motion.div
+      ref={sidebarRef}
+      initial={{ width: isSidebarOpen ? 200 : 60 }}
+      animate={{ width: isSidebarOpen ? 200 : 60 }}
+      transition={{ type: "spring", stiffness: 250, damping: 25 }}
+      className="fixed top-16 left-0 bg-gray-900 text-white h-[calc(100vh-64px)] pb-3 flex flex-col z-50"
+    >
+      <div className="overflow-y-auto flex-1 mt-2 px-2">
+        <nav className="space-y-1">
+          <NavItem icon={<FaHome size={18} />} text="Home" isSidebarOpen={isSidebarOpen} />
+          <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} />
+          <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} />
+          <NavItem icon={<FaUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} />
 
-              {/* User Management */}
-              <div>
-                <button
-                  onClick={() => setUserMgmtOpen(!userMgmtOpen)}
-                  className="flex justify-between w-full px-3 py-2 rounded hover:bg-gray-700"
-                >
-                  <span className="flex items-center">
-                    <FaUsers className="mr-3" /> User Management
-                  </span>
-                  {userMgmtOpen ? <FiChevronUp /> : <FiChevronDown />}
-                </button>
-                <AnimatePresence>
-                  {userMgmtOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="ml-4 space-y-2 overflow-hidden"
-                    >
-                      <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                        View All Users
-                      </a>
-                      <div>
-                        <button
-                          onClick={() => setEditUserOpen(!editUserOpen)}
-                          className="flex justify-between w-full px-3 py-2 rounded hover:bg-gray-700"
-                        >
-                          <span className="flex items-center">
-                            <FaUserEdit className="mr-3" /> Edit User Details
-                          </span>
-                          {editUserOpen ? <FiChevronUp /> : <FiChevronDown />}
-                        </button>
-                        <AnimatePresence>
-                          {editUserOpen && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: "auto" }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="ml-4 space-y-2 overflow-hidden"
-                            >
-                              <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                Edit Name
-                              </a>
-                              <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                Edit Email
-                              </a>
-                              <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                Edit Role
-                              </a>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                      <a href="#" className="flex items-center px-3 py-2 rounded hover:bg-gray-700">
-                        <FaUserMinus className="mr-3" /> Delete Users
-                      </a>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+          {/* User Management */}
+          <DropdownItem
+            icon={<FaUsers size={16} />}
+            text="User Mgmt"
+            isSidebarOpen={isSidebarOpen}
+            isOpen={userMgmtOpen}
+            toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}
+          >
+            <SubNavItem text="View Users" />
+            <DropdownItem
+              icon={<FaUserEdit size={14} />}
+              text="Edit User"
+              isSidebarOpen={isSidebarOpen}
+              isOpen={editUserOpen}
+              toggleOpen={() => setEditUserOpen(!editUserOpen)}
+            >
+              <SubNavItem text="Edit Name" />
+              <SubNavItem text="Edit Email" />
+              <SubNavItem text="Edit Role" />
+            </DropdownItem>
+            <SubNavItem icon={<FaUserMinus size={14} />} text="Delete Users" />
+          </DropdownItem>
 
-              {/* Roles Management */}
-              <div>
-                <button
-                  onClick={() => setRolesMgmtOpen(!rolesMgmtOpen)}
-                  className="flex justify-between w-full px-3 py-2 rounded hover:bg-gray-700"
-                >
-                  <span className="flex items-center">
-                    <FaUserEdit className="mr-3" /> Roles Management
-                  </span>
-                  {rolesMgmtOpen ? <FiChevronUp /> : <FiChevronDown />}
-                </button>
-                <AnimatePresence>
-                  {rolesMgmtOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="ml-4 space-y-2 overflow-hidden"
-                    >
-                      <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                        Edit or Update Roles
-                      </a>
-                      <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                        Remove Roles
-                      </a>
-                      <a href="#" className="block px-3 py-2 rounded hover:bg-gray-700">
-                        Assign Roles to Users
-                      </a>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </nav>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {/* Roles Management */}
+          <DropdownItem
+            icon={<FaUserEdit size={16} />}
+            text="Roles Mgmt"
+            isSidebarOpen={isSidebarOpen}
+            isOpen={rolesMgmtOpen}
+            toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}
+          >
+            <SubNavItem text="Update Roles" />
+            <SubNavItem text="Remove Roles" />
+            <SubNavItem text="Assign Roles" />
+          </DropdownItem>
+        </nav>
+      </div>
+    </motion.div>
   );
 };
+
+const NavItem = ({ icon, text, isSidebarOpen }) => (
+  <a
+    href="#"
+    className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
+      isSidebarOpen ? "justify-start" : "justify-center"
+    }`}
+  >
+    <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
+    {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
+  </a>
+);
+
+const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
+  <div className="mb-[1px]">
+    <button
+      onClick={toggleOpen}
+      className={`flex items-center w-full p-[6px] rounded hover:bg-gray-700 transition-all ${
+        isSidebarOpen ? "justify-start" : "justify-center"
+      }`}
+    >
+      <div className="flex items-center">
+        <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
+        {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
+      </div>
+      {isSidebarOpen && (
+        <span className="ml-auto flex items-center justify-center">
+          {isOpen ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
+        </span>
+      )}
+    </button>
+    {isSidebarOpen && isOpen && (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
+        transition={{ duration: 0 }}
+        className="ml-4 space-y-[2px] overflow-hidden"
+      >
+        {children}
+      </motion.div>
+    )}
+  </div>
+);
+
+const SubNavItem = ({ icon, text }) => (
+  <a href="#" className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
+    {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}
+    <span className="text-[14px] ml-2">{text}</span>
+  </a>
+);
 
 export default Sidebar;
