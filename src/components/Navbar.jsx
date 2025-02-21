@@ -1,10 +1,9 @@
-import React from "react";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
-
-// Custom hook for outside clicks
+import { useNavigate } from "react-router-dom";
+// Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,7 +18,9 @@ const useOutsideClick = (ref, callback) => {
   }, [ref, callback]);
 };
 
-const Navbar = ({ toggleSidebar }) => {
+const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
+  const navigate = useNavigate(); 
+
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isUserOpen, setIsUserOpen] = useState(false);
@@ -35,26 +36,38 @@ const Navbar = ({ toggleSidebar }) => {
   useOutsideClick(userRef, () => setIsUserOpen(false));
   useOutsideClick(searchRef, () => setIsSearchOpen(false));
 
+  const handleHamburgerClick = () => {
+    toggleSidebar();
+  };
+
+   const handleLogout =()=>{
+    localStorage.removeItem("user");
+    navigate("/");
+   }
+
   return (
-    <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-3 flex items-center justify-between">
+    <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-2 flex items-center justify-between">
       {/* Left Side: Hamburger Toggle and Logo */}
       <div className="flex items-center">
-        <button onClick={toggleSidebar} className="text-white mr-3 flex items-center">
-          <Menu size={20} />
+        <button onClick={handleHamburgerClick} className="text-white mr-3 flex items-center">
+          {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <img src={logo} alt="Logo" className="h-10" />
+        <img src={logo} alt="Logo" className="h-10 mt-1 ml-1" />
       </div>
 
       {/* Right Side Navbar Items */}
       <div className="flex items-center space-x-4 sm:space-x-6 ml-auto relative w-full justify-end">
         {/* Desktop Search */}
-        <div className="hidden sm:flex items-center">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-56 md:w-64 lg:w-72 xl:w-80 py-1.5 pl-8 pr-3 bg-gray-200 text-gray-800 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm border border-gray-300 hover:bg-gray-300"
-          />
-        </div>
+        {!isSearchOpen && (
+          <div className="hidden sm:flex items-center bg-gray-800 text-gray-100 rounded-full px-3 py-1 shadow-lg w-[300px] transition-all duration-300 ease-in-out hover:scale-105">
+            <Search className="text-gray-400 mr-3" size={18} />
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400 rounded-md"
+            />
+          </div>
+        )}
 
         {/* Mobile Search */}
         {isSearchOpen ? (
@@ -63,18 +76,18 @@ const Navbar = ({ toggleSidebar }) => {
             initial={{ width: "50px", opacity: 0 }}
             animate={{ width: "calc(100% - 80px)", opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-200 text-gray-800 rounded-lg px-4 py-2 shadow-md flex items-center sm:hidden"
+            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-gray-100 rounded-md px-3 py-1 shadow-lg flex items-center sm:hidden"
             style={{ maxWidth: "600px" }}
           >
-            <Search className="text-gray-600 mr-2" size={18} />
+            <Search className="text-gray-400 mr-2" size={18} />
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent focus:outline-none"
+              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400"
               autoFocus
             />
             <button onClick={() => setIsSearchOpen(false)}>
-              <X className="text-gray-600" size={20} />
+              <X className="text-gray-400" size={20} />
             </button>
           </motion.div>
         ) : (
@@ -97,7 +110,7 @@ const Navbar = ({ toggleSidebar }) => {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-64 bg-white text-gray-800 border rounded-lg shadow-lg p-4"
+                  className="absolute right-[-20px] mt-2 min-w-[180px] bg-white text-gray-800 border rounded-lg shadow-lg p-3"
                 >
                   <p className="text-sm">No new notifications</p>
                 </motion.div>
@@ -118,7 +131,7 @@ const Navbar = ({ toggleSidebar }) => {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-48 bg-white text-gray-900 border rounded-lg shadow-lg"
+                  className="absolute right-0 mt-2 min-w-[150px] bg-white text-gray-900 border rounded-lg shadow-lg"
                 >
                   <ul className="p-2">
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">English</li>
@@ -140,13 +153,13 @@ const Navbar = ({ toggleSidebar }) => {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="absolute right-0 mt-2 w-56 bg-white text-gray-900 border rounded-lg shadow-lg"
+                  className="absolute right-0 mt-2 min-w-[150px] bg-white text-gray-900 border rounded-lg shadow-lg"
                 >
                   <ul className="p-2">
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Dashboard</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Logout</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
                   </ul>
                 </motion.div>
               )}
