@@ -1,21 +1,26 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar"; // Update the path to Sidebar if necessary
-import Navbar from "../components/Navbar"; // Update the path to Navbar if necessary
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+import Dashboard from "../components/Dashboard";
 
 const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen((prevState) => !prevState);
+    setIsSidebarOpen((prev) => !prev);
   };
 
   return (
-    <div>
-      <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      {/* Other content of your Home page */}
+    <div className="bg-gray-100 min-h-screen pt-16 flex">
+      <Navbar toggleSidebar={toggleSidebar} />
+      <Sidebar isSidebarOpen={isSidebarOpen} />
+      <div className={`flex-1 transition-all ${isSidebarOpen ? "ml-64" : "ml-0"}`}>
+        <Dashboard />
+      </div>
     </div>
   );
 };
 
 export default Home;
+
+
