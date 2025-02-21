@@ -1,13 +1,22 @@
-import React from "react";
-import Home from "./pages/Home"; // Ensure correct path
+import "./App.css";
+import Home from "./pages/Home";
+import Login from "./pages/Auth/Login";
+import SignIn from "./pages/Auth/SignIn";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <Home />
-      
-    </div>
-  );
-}
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<SignIn />} />
+        <Route path="/login" element={ <Login />} />
+        <Route path="/home" element={ <Home />}/>
+      </Routes>
+    </BrowserRouter>
+  )
+  };
+
+
+
 
 export default App;
