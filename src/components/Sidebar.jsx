@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { FaHome, FaUsers, FaUserEdit, FaUserMinus, FaEye } from "react-icons/fa";
+import { Link } from "react-router-dom"; // ✅ Import Link for routing
+import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
 import { IoMdListBox } from "react-icons/io";
@@ -7,9 +8,7 @@ import { motion } from "framer-motion";
 import { LuUsers } from "react-icons/lu";
 import { FaBuildingUser } from "react-icons/fa6";
 import { FaIdBadge } from "react-icons/fa";
-import { MdNoAccounts } from "react-icons/md";
-import { MdManageAccounts } from "react-icons/md";
-import { Link } from "react-router-dom"; // Use Link for navigation
+import { MdNoAccounts, MdManageAccounts } from "react-icons/md";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
@@ -17,10 +16,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [editUserOpen, setEditUserOpen] = useState(false);
   const sidebarRef = useRef(null);
 
-  // Only attach outside click handler on mobile devices
+  // Detect clicks outside the sidebar and close it only on mobile devices (width < 640px)
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if the device is mobile (width < 640px)
       if (window.innerWidth < 640) {
         if (
           sidebarRef.current &&
@@ -46,31 +44,33 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         !isSidebarOpen ? "hidden sm:flex" : "flex"
       } flex-col`}
     >
-      <div className="overflow-y-auto flex-1 mt-2 px-3">
-        <nav className="space-y-2">
+      <div className="overflow-y-auto flex-1 mt-2 px-2">
+        <nav className="space-y-1">
+          {/* Navigation Links */}
           <NavItem
-            to="/home"
             icon={<FaHome size={18} />}
             text="Home"
             isSidebarOpen={isSidebarOpen}
+            path="/home/homepage"
           />
           <NavItem
-            to="/dashboard"
             icon={<HiOutlineViewGrid size={18} />}
             text="Dashboard"
             isSidebarOpen={isSidebarOpen}
+            path="/home/Dashboard"
           />
           <NavItem
-            to="/menupage"
             icon={<IoMdListBox size={18} />}
             text="Menu Page"
             isSidebarOpen={isSidebarOpen}
+            path="/home/menu"
           />
+          {/* Updated User List to use "/userlist" as in your code */}
           <NavItem
-            to="/userlist"
             icon={<LuUsers size={18} />}
             text="User List"
             isSidebarOpen={isSidebarOpen}
+            path="/userlist"
           />
 
           {/* User Management */}
@@ -81,7 +81,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             isOpen={userMgmtOpen}
             toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}
           >
-            <SubNavItem icon={<FaEye size={14} />} text="View Users" />
+            <SubNavItem text="View Users" />
             <DropdownItem
               icon={<FaUserEdit size={14} />}
               text="Edit User"
@@ -114,9 +114,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-const NavItem = ({ to, icon, text, isSidebarOpen }) => (
+// Updated NavItem Component with Link
+const NavItem = ({ icon, text, isSidebarOpen, path }) => (
   <Link
-    to={to}
+    to={path}
     className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
       isSidebarOpen ? "justify-start" : "justify-center"
     }`}
@@ -126,6 +127,7 @@ const NavItem = ({ to, icon, text, isSidebarOpen }) => (
   </Link>
 );
 
+// Dropdown Component
 const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
   <div className="mb-[1px]">
     <button
@@ -158,6 +160,7 @@ const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children 
   </div>
 );
 
+// Sub Navigation Item
 const SubNavItem = ({ icon, text }) => (
   <a href="#" className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
     {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}
