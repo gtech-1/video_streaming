@@ -46,6 +46,9 @@ const Home = () => {
       {/* <Dashboard /> */}
         <Outlet /> {/* This will render the selected page */}
       </div>
+
+      {/* Background overlay when sidebar is open on mobile */}
+      {isSidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 lg:hidden" onClick={toggleSidebar}></div>}
     </div>
   );
 };
