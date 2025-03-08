@@ -9,14 +9,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<SignIn />} />
-        <Route path="/login" element={ <Login />} />
-        <Route path="/home" element={ <Home />}/>
+        <Route path="/login" element={<Login />} />
+        <Route path="/home/*" element={<Home />} /> {/* Handles internal routing */}
       </Routes>
     </BrowserRouter>
-  )
-  };
-
-
-
+  );
+}
 
 export default App;
