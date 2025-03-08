@@ -16,7 +16,9 @@ const UpcomingEvents = () => {
   });
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="relative p-6 bg-white shadow-md rounded-xl overflow-hidden">
+      {/* Indigo animated border */}
+      <div className="absolute inset-0 border-2 border-indigo-500 rounded-xl animate-pulse"></div>
       <h2 className="text-xl font-bold mb-4">⏳ Upcoming Events</h2>
       <ul>
         {sortedEvents.map((event, index) => (
