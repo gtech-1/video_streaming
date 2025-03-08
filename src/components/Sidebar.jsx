@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; // ✅ Import Link for routing
 import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
@@ -43,15 +43,11 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     >
       <div className="overflow-y-auto flex-1 mt-2 px-2">
         <nav className="space-y-1">
-          <NavItem icon={<FaHome size={18} />} text="Home" isSidebarOpen={isSidebarOpen} />
-          <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} />
-
-          {/* ✅ Fixed: Proper alignment for Menu Page */}
-          <Link to="/home/courses" className="block">
-            <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} />
-          </Link>
-
-          <NavItem icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} />
+          {/* ✅ Updated Navigation Links */}
+          <NavItem icon={<FaHome size={18} />} text="HomePage" isSidebarOpen={isSidebarOpen} path="/home/homepage" />
+          <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} path="/home/Dashboard" />
+          <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} path="/home/menu" />
+          <NavItem icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} path="/home/userlist" />
 
           {/* User Management */}
           <DropdownItem
@@ -94,16 +90,20 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-const NavItem = ({ icon, text, isSidebarOpen }) => (
-  <div className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
+// ✅ Updated NavItem Component with Link
+const NavItem = ({ icon, text, isSidebarOpen, path }) => (
+  <Link
+    to={path}
+    className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
       isSidebarOpen ? "justify-start" : "justify-center"
     }`}
   >
     <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
     {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
-  </div>
+  </Link>
 );
 
+// Dropdown Component
 const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
   <div className="mb-[1px]">
     <button
@@ -136,6 +136,7 @@ const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children 
   </div>
 );
 
+// Sub Navigation Item
 const SubNavItem = ({ icon, text }) => (
   <div className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
     {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}

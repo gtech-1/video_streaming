@@ -255,6 +255,10 @@ const CourseVideos = () => {
     const { id } = useParams(); // Get course ID from URL
     const videosPerPage = 9;
     const [currentPage, setCurrentPage] = useState(1);
+
+    if (!id) {
+      return <div className="text-center text-red-500">Error: Course not found</div>;
+    }
   
     const filteredVideos = courseVideosData[id] || [];
     const totalPages = Math.ceil(filteredVideos.length / videosPerPage);

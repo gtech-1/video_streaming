@@ -35,7 +35,7 @@ const Courses = () => {
         {courses.map((course) => (
           <Link
             key={course.id}
-            to={`/home/courses/${course.id}`}
+            to={`/home/courses/${course.id}`} // Corrected path to match the router
             className="bg-white shadow-md rounded-lg overflow-hidden transform hover:scale-105 transition"
           >
             <img
