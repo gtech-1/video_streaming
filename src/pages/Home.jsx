@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import Dashboard from "../components/Dashboard";
-import Courses from "./Courses";
+import Courses from "./MenuPage";
 import CourseVideos from "../components/CourseVideos";
 
 const Home = () => {
