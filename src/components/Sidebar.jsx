@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
+import { FaHome, FaUsers, FaUserEdit, FaUserMinus, FaEye } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
 import { IoMdListBox } from "react-icons/io";
@@ -9,6 +9,7 @@ import { FaBuildingUser } from "react-icons/fa6";
 import { FaIdBadge } from "react-icons/fa";
 import { MdNoAccounts } from "react-icons/md";
 import { MdManageAccounts } from "react-icons/md";
+import { Link } from "react-router-dom"; // Use Link for navigation
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [userMgmtOpen, setUserMgmtOpen] = useState(false);
@@ -16,15 +17,18 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [editUserOpen, setEditUserOpen] = useState(false);
   const sidebarRef = useRef(null);
 
-  // Detect clicks outside the sidebar and close it
+  // Only attach outside click handler on mobile devices
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        isSidebarOpen
-      ) {
-        toggleSidebar();
+      // Check if the device is mobile (width < 640px)
+      if (window.innerWidth < 640) {
+        if (
+          sidebarRef.current &&
+          !sidebarRef.current.contains(event.target) &&
+          isSidebarOpen
+        ) {
+          toggleSidebar();
+        }
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -38,19 +42,36 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
       initial={{ width: isSidebarOpen ? 250 : 60 }}
       animate={{ width: isSidebarOpen ? 250 : 60 }}
       transition={{ type: "spring", stiffness: 250, damping: 25 }}
-      // Added h-[calc(100vh-56px)] to occupy full height minus the navbar, 
-      // and conditionally hide on mobile when closed.
-      className={`fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50  ${
+      className={`fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50 ${
         !isSidebarOpen ? "hidden sm:flex" : "flex"
       } flex-col`}
     >
-      <div className="overflow-y-auto flex-1 mt-2 px-2">
-        <nav className="space-y-1">
-          <NavItem icon={<FaHome size={18} />} text="Home" isSidebarOpen={isSidebarOpen} />
-          <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} />
-          <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} />
-          <NavItem icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} />
-          
+      <div className="overflow-y-auto flex-1 mt-2 px-3">
+        <nav className="space-y-2">
+          <NavItem
+            to="/home"
+            icon={<FaHome size={18} />}
+            text="Home"
+            isSidebarOpen={isSidebarOpen}
+          />
+          <NavItem
+            to="/dashboard"
+            icon={<HiOutlineViewGrid size={18} />}
+            text="Dashboard"
+            isSidebarOpen={isSidebarOpen}
+          />
+          <NavItem
+            to="/menupage"
+            icon={<IoMdListBox size={18} />}
+            text="Menu Page"
+            isSidebarOpen={isSidebarOpen}
+          />
+          <NavItem
+            to="/userlist"
+            icon={<LuUsers size={18} />}
+            text="User List"
+            isSidebarOpen={isSidebarOpen}
+          />
 
           {/* User Management */}
           <DropdownItem
@@ -60,7 +81,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             isOpen={userMgmtOpen}
             toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}
           >
-            <SubNavItem text="View Users" />
+            <SubNavItem icon={<FaEye size={14} />} text="View Users" />
             <DropdownItem
               icon={<FaUserEdit size={14} />}
               text="Edit User"
@@ -83,9 +104,9 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             isOpen={rolesMgmtOpen}
             toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}
           >
-            <SubNavItem icon={<MdManageAccounts size={15}/>}  text="Update Roles"/>
-            <SubNavItem icon={<MdNoAccounts size={15}/>}  text="Remove Roles" />
-            <SubNavItem icon={<FaIdBadge size={15}/>}   text="Assign Roles" />
+            <SubNavItem icon={<MdManageAccounts size={15} />} text="Update Roles" />
+            <SubNavItem icon={<MdNoAccounts size={15} />} text="Remove Roles" />
+            <SubNavItem icon={<FaIdBadge size={15} />} text="Assign Roles" />
           </DropdownItem>
         </nav>
       </div>
@@ -93,16 +114,16 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-const NavItem = ({ icon, text, isSidebarOpen }) => (
-  <a
-    href="#"
+const NavItem = ({ to, icon, text, isSidebarOpen }) => (
+  <Link
+    to={to}
     className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
       isSidebarOpen ? "justify-start" : "justify-center"
     }`}
   >
     <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
     {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
-  </a>
+  </Link>
 );
 
 const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
