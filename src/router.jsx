@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import MenuPage from "./pages/MenuPage";
 import UserList from "./pages/UserList"; // Updated to use your UserList component
 import Dashboard from "./components/Dashboard";
+import CourseVideos from "./components/CourseVideos";
 
 const router = createBrowserRouter([
   { path: "/", element: <SignIn /> },
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: "menu", element: <MenuPage /> },
       // Removed the nested userlist route to avoid duplication
       { path: "dashboard", element: <Dashboard /> },
+      { path: "courses/:id", element: <CourseVideos /> },
     ],
   },
   // New top-level route for User List

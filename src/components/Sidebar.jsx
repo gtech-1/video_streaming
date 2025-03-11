@@ -17,6 +17,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const sidebarRef = useRef(null);
 
   // Detect clicks outside the sidebar and close it only on mobile devices (width < 640px)
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (window.innerWidth < 640) {
@@ -162,10 +163,10 @@ const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children 
 
 // Sub Navigation Item
 const SubNavItem = ({ icon, text }) => (
-  <a href="#" className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
+  <div className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
     {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}
     <span className="text-[14px] ml-2">{text}</span>
-  </a>
+  </div>
 );
 
 export default Sidebar;
