@@ -4,7 +4,7 @@ import Login from "./pages/Auth/Login";
 import SignIn from "./pages/Auth/SignIn";
 import HomePage from "./pages/HomePage";
 import MenuPage from "./pages/MenuPage";
-import Userlist from "./pages/Userlist";
+import UserList from "./pages/UserList"; // Updated to use your UserList component
 import Dashboard from "./components/Dashboard";
 import CourseVideos from "./components/CourseVideos";
 
@@ -17,11 +17,13 @@ const router = createBrowserRouter([
     children: [
       { path: "homepage", element: <HomePage /> },
       { path: "menu", element: <MenuPage /> },
-      { path: "userlist", element: <Userlist /> },
+      // Removed the nested userlist route to avoid duplication
       { path: "dashboard", element: <Dashboard /> },
       { path: "courses/:id", element: <CourseVideos /> },
     ],
   },
+  // New top-level route for User List
+  { path: "/userlist", element: <UserList /> }
 ]);
 
 export default router;

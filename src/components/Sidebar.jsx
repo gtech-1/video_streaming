@@ -16,14 +16,18 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [editUserOpen, setEditUserOpen] = useState(false);
   const sidebarRef = useRef(null);
 
+  // Detect clicks outside the sidebar and close it only on mobile devices (width < 640px)
+
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
-        isSidebarOpen
-      ) {
-        toggleSidebar();
+      if (window.innerWidth < 640) {
+        if (
+          sidebarRef.current &&
+          !sidebarRef.current.contains(event.target) &&
+          isSidebarOpen
+        ) {
+          toggleSidebar();
+        }
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -43,11 +47,32 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     >
       <div className="overflow-y-auto flex-1 mt-2 px-2">
         <nav className="space-y-1">
-          {/* ✅ Updated Navigation Links */}
-          <NavItem icon={<FaHome size={18} />} text="HomePage" isSidebarOpen={isSidebarOpen} path="/home/homepage" />
-          <NavItem icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} path="/home/Dashboard" />
-          <NavItem icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} path="/home/menu" />
-          <NavItem icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} path="/home/userlist" />
+          {/* Navigation Links */}
+          <NavItem
+            icon={<FaHome size={18} />}
+            text="Home"
+            isSidebarOpen={isSidebarOpen}
+            path="/home/homepage"
+          />
+          <NavItem
+            icon={<HiOutlineViewGrid size={18} />}
+            text="Dashboard"
+            isSidebarOpen={isSidebarOpen}
+            path="/home/Dashboard"
+          />
+          <NavItem
+            icon={<IoMdListBox size={18} />}
+            text="Menu Page"
+            isSidebarOpen={isSidebarOpen}
+            path="/home/menu"
+          />
+          {/* Updated User List to use "/userlist" as in your code */}
+          <NavItem
+            icon={<LuUsers size={18} />}
+            text="User List"
+            isSidebarOpen={isSidebarOpen}
+            path="/userlist"
+          />
 
           {/* User Management */}
           <DropdownItem
@@ -90,7 +115,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-// ✅ Updated NavItem Component with Link
+// Updated NavItem Component with Link
 const NavItem = ({ icon, text, isSidebarOpen, path }) => (
   <Link
     to={path}
