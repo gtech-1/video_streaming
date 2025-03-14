@@ -3,6 +3,10 @@ import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
+
+
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
   useEffect(() => {
@@ -157,7 +161,9 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                 >
                   <ul className="p-2">
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Dashboard</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                      <Link to="/home/dashboard">Dashboard</Link> {/* ✅ Link added here */}
+                    </li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
                   </ul>
@@ -172,3 +178,5 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
 };
 
 export default Navbar;
+
+
