@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom"; // ✅ Import Link for routing
+import { Link } from "react-router-dom";
 import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
@@ -15,8 +15,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [rolesMgmtOpen, setRolesMgmtOpen] = useState(false);
   const [editUserOpen, setEditUserOpen] = useState(false);
   const sidebarRef = useRef(null);
-
-  // Detect clicks outside the sidebar and close it only on mobile devices (width < 640px)
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -47,7 +45,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     >
       <div className="overflow-y-auto flex-1 mt-2 px-2">
         <nav className="space-y-1">
-          {/* Navigation Links */}
           <NavItem
             icon={<FaHome size={18} />}
             text="Home"
@@ -58,7 +55,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             icon={<HiOutlineViewGrid size={18} />}
             text="Dashboard"
             isSidebarOpen={isSidebarOpen}
-            path="/home/Dashboard"
+            path="/home/dashboard"
           />
           <NavItem
             icon={<IoMdListBox size={18} />}
@@ -66,15 +63,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             isSidebarOpen={isSidebarOpen}
             path="/home/menu"
           />
-          {/* Updated User List to use "/userlist" as in your code */}
           <NavItem
             icon={<LuUsers size={18} />}
             text="User List"
             isSidebarOpen={isSidebarOpen}
-            path="/userlist"
+            path="/home/userlist"
           />
-
-          {/* User Management */}
           <DropdownItem
             icon={<FaUsers size={16} />}
             text="User Mgmt"
@@ -96,8 +90,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             </DropdownItem>
             <SubNavItem icon={<FaUserMinus size={14} />} text="Delete User" />
           </DropdownItem>
-
-          {/* Roles Management */}
           <DropdownItem
             icon={<FaBuildingUser size={16} />}
             text="Roles Mgmt"
@@ -115,7 +107,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-// Updated NavItem Component with Link
 const NavItem = ({ icon, text, isSidebarOpen, path }) => (
   <Link
     to={path}
@@ -128,7 +119,6 @@ const NavItem = ({ icon, text, isSidebarOpen, path }) => (
   </Link>
 );
 
-// Dropdown Component
 const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
   <div className="mb-[1px]">
     <button
@@ -161,7 +151,6 @@ const DropdownItem = ({ icon, text, isSidebarOpen, isOpen, toggleOpen, children 
   </div>
 );
 
-// Sub Navigation Item
 const SubNavItem = ({ icon, text }) => (
   <div className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all">
     {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}
