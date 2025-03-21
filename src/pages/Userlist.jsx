@@ -114,17 +114,11 @@ const UserList = ({ isSidebarOpen }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:px-3 md:py-3">
+    <div className="min-h-screen bg-gray-100 p-6">
       <Toaster position="top-right" />
 
-      {/* Desktop view container with updated padding logic */}
-      <div
-        className={`w-full md:transition-all md:duration-300 ${
-          isSidebarOpen
-            ? "md:pl-[60px] md:pr-[10px]"
-            : "md:pl-[10px] md:pr-[10px]"
-        }`}
-      >
+      {/* Main container with a max width and centered (similar to courses.jsx) */}
+      <div className="max-w-6xl mx-auto w-full transition-all duration-300">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-wrap gap-2">
@@ -229,8 +223,8 @@ const UserList = ({ isSidebarOpen }) => {
           Total {userType}: {filteredData.length}
         </div>
 
-        {/* Mobile View */}
-        <div className="md:hidden space-y-3">
+        {/* For screens below lg, show card view (more fluid on iPad mini) */}
+        <div className="lg:hidden space-y-3">
           {paginatedData.map((user) => (
             <div
               key={user.id}
@@ -288,8 +282,8 @@ const UserList = ({ isSidebarOpen }) => {
           ))}
         </div>
 
-        {/* Desktop Table */}
-        <div className="hidden md:block bg-white rounded-lg shadow-sm overflow-x-auto">
+        {/* For screens lg and above, show table view */}
+        <div className="hidden lg:block bg-white rounded-lg shadow-sm overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -383,9 +377,7 @@ const UserList = ({ isSidebarOpen }) => {
         {filteredData.length > rowsPerPage && (
           <div className="flex justify-center items-center gap-4 mt-6">
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.max(1, prev - 1))
-              }
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -395,9 +387,7 @@ const UserList = ({ isSidebarOpen }) => {
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-              }
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -419,9 +409,7 @@ const UserList = ({ isSidebarOpen }) => {
                     name: form.name.value,
                     email: form.email.value,
                     mobile: form.mobile.value,
-                    photo:
-                      form.photo.value ||
-                      "https://via.placeholder.com/150",
+                    photo: form.photo.value || "https://via.placeholder.com/150",
                     status: form.status.value,
                   };
                   handleAddUser(newUser);
