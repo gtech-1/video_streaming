@@ -16,11 +16,18 @@ const Home = () => {
       <div className="fixed top-0 left-0 h-full z-50 lg:relative">
         <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       </div>
-      <div className={`flex-1 transition-all ${isSidebarOpen ? "lg:ml-64" : ""} p-4`}>
+      <div
+        className={`flex-1 transition-all p-4 ${
+          isSidebarOpen ? "lg:ml-64" : "lg:pl-20"
+        }`}
+      >
         <Outlet />
       </div>
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 lg:hidden" onClick={toggleSidebar}></div>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 lg:hidden"
+          onClick={toggleSidebar}
+        ></div>
       )}
     </div>
   );

@@ -117,11 +117,12 @@ const UserList = ({ isSidebarOpen }) => {
     <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:px-3 md:py-3">
       <Toaster position="top-right" />
 
+      {/* Desktop view container with updated padding logic */}
       <div
         className={`w-full md:transition-all md:duration-300 ${
           isSidebarOpen
-            ? "md:mx-0 md:w-full md:pl-0"
-            : "md:mx-[15px] md:w-[calc(100%-50px)] md:pl-8"
+            ? "md:pl-[60px] md:pr-[10px]"
+            : "md:pl-[10px] md:pr-[10px]"
         }`}
       >
         {/* Header Section */}
