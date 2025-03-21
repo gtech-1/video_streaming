@@ -1,8 +1,3 @@
-
-
-
-
-
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import WelcomeBack from "./WelcomeBack";
 import StatisticsChart from "./StatisticsChart";
@@ -11,7 +6,7 @@ import CreditsDoughnutChart from "./CreditsDoughnutChart";
 import RecentlyAccessedCourses from "./RecentlyAccessedCourses";
 import AttendanceBarGraph from "./AttendanceBarGraph";
 import TopStudents from "./TopStudents";
- import CgpaLineGraph from "./CgpaLineGraph";
+import CgpaLineGraph from "./CgpaLineGraph";
 import StatsCards from "./StatsCards";
 import FrequentlyAskedQuestions from "./FrequentlyAskedQuestions";
 
