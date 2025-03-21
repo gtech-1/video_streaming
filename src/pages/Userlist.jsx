@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import UserDetails from "../components/UserDetails.json";
-import { FaEdit, FaTrash, FaPlus, FaDownload, FaUpload } from "react-icons/fa";
+import { FaPlus, FaDownload, FaUpload } from "react-icons/fa";
 import { FiFilter, FiChevronLeft, FiChevronRight, FiMoreVertical } from "react-icons/fi";
+import { MdEdit, MdDelete } from "react-icons/md"; // New icons from Material Design
 
 // Initialize data with unique ids if not provided
 const initializeUsers = (users) =>
@@ -29,6 +30,32 @@ const UserList = ({ isSidebarOpen }) => {
 
   // New state for mobile "More Options" dropdown
   const [showMoreOptions, setShowMoreOptions] = useState(false);
+
+  // Refs for dropdowns
+  const filterRef = useRef(null);
+  const moreOptionsRef = useRef(null);
+
+  // Click outside handling for Filter dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilters(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Click outside handling for Mobile More Options dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (moreOptionsRef.current && !moreOptionsRef.current.contains(event.target)) {
+        setShowMoreOptions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Memoized current data based on selected user type
   const currentData = useMemo(() => {
@@ -160,7 +187,7 @@ const UserList = ({ isSidebarOpen }) => {
               </button>
 
               {/* Mobile view: More Options for Export & Import */}
-              <div className="block sm:hidden relative">
+              <div className="block sm:hidden relative" ref={moreOptionsRef}>
                 <button
                   onClick={() => setShowMoreOptions((prev) => !prev)}
                   className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
@@ -191,7 +218,7 @@ const UserList = ({ isSidebarOpen }) => {
             </div>
 
             {/* Filter Button */}
-            <div className="relative">
+            <div className="relative" ref={filterRef}>
               <button
                 onClick={() => setShowFilters((prev) => !prev)}
                 className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
@@ -260,7 +287,7 @@ const UserList = ({ isSidebarOpen }) => {
                     {user.status}
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={() => {
                       setSelectedUser(user);
@@ -268,7 +295,7 @@ const UserList = ({ isSidebarOpen }) => {
                     }}
                     className="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50"
                   >
-                    <FaEdit className="text-base" />
+                    <MdEdit className="text-base" />
                   </button>
                   <button
                     onClick={() => {
@@ -277,7 +304,7 @@ const UserList = ({ isSidebarOpen }) => {
                     }}
                     className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50"
                   >
-                    <FaTrash className="text-base" />
+                    <MdDelete className="text-base" />
                   </button>
                   <button className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition-colors">
                     Login
@@ -347,7 +374,7 @@ const UserList = ({ isSidebarOpen }) => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
                       <button
                         onClick={() => {
                           setSelectedUser(user);
@@ -355,7 +382,7 @@ const UserList = ({ isSidebarOpen }) => {
                         }}
                         className="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50"
                       >
-                        <FaEdit />
+                        <MdEdit />
                       </button>
                       <button
                         onClick={() => {
@@ -364,7 +391,7 @@ const UserList = ({ isSidebarOpen }) => {
                         }}
                         className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50"
                       >
-                        <FaTrash />
+                        <MdDelete />
                       </button>
                     </div>
                   </td>
