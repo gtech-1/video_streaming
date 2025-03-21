@@ -31,6 +31,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // On mobile, close sidebar if clicked outside
       if (window.innerWidth < 640) {
         if (
           sidebarRef.current &&
@@ -223,7 +224,6 @@ const DropdownItem = ({
   </div>
 );
 
-// Updated SubNavItem is now a Link that calls toggleSidebar on mobile.
 const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
   const handleClick = () => {
     if (window.innerWidth < 640 && toggleSidebar) {
