@@ -1,10 +1,9 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import UserDetails from "../components/UserDetails.json";
 import { FaEdit, FaTrash, FaPlus, FaDownload, FaUpload } from "react-icons/fa";
 import { FiFilter, FiChevronLeft, FiChevronRight, FiMoreVertical } from "react-icons/fi";
 
-// Initialize data with unique ids if not provided
 const initializeUsers = (users) =>
   users.map((user, index) => ({
     id: user.id || Date.now() + index,
@@ -13,8 +12,8 @@ const initializeUsers = (users) =>
 
 const UserList = ({ isSidebarOpen }) => {
   // State initialization
-  const [members, setMembers] = useState(initializeUsers(UserDetails.members));
-  const [admins, setAdmins] = useState(initializeUsers(UserDetails.admins));
+  const [members, setMembers] = useState(() => initializeUsers(UserDetails.members));
+  const [admins, setAdmins] = useState(() => initializeUsers(UserDetails.admins));
   const [userType, setUserType] = useState("members");
   const [showFilters, setShowFilters] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
@@ -30,26 +29,49 @@ const UserList = ({ isSidebarOpen }) => {
   // New state for mobile "More Options" dropdown
   const [showMoreOptions, setShowMoreOptions] = useState(false);
 
+  // Refs for dropdowns
+  const filterRef = useRef(null);
+  const moreOptionsRef = useRef(null);
+
+  // Click outside handling for Filter dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setShowFilters(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Click outside handling for More Options dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (moreOptionsRef.current && !moreOptionsRef.current.contains(event.target)) {
+        setShowMoreOptions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Memoized current data based on selected user type
-  const currentData = useMemo(() => {
-    return userType === "members" ? members : admins;
-  }, [userType, members, admins]);
+  const currentData = useMemo(
+    () => (userType === "members" ? members : admins),
+    [userType, members, admins]
+  );
 
   // Memoized filtered data based on user status
   const filteredData = useMemo(() => {
     if (filterStatus === "all") return currentData;
-    if (filterStatus === "active")
-      return currentData.filter((user) => user.status === "Active");
+    if (filterStatus === "active") return currentData.filter((user) => user.status === "Active");
     if (filterStatus === "inactive")
       return currentData.filter((user) => user.status !== "Active");
     return currentData;
   }, [currentData, filterStatus]);
 
   // Memoized pagination calculations
-  const totalPages = useMemo(
-    () => Math.ceil(filteredData.length / rowsPerPage),
-    [filteredData, rowsPerPage]
-  );
+  const totalPages = useMemo(() => Math.ceil(filteredData.length / rowsPerPage), [filteredData, rowsPerPage]);
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     return filteredData.slice(startIndex, startIndex + rowsPerPage);
@@ -114,20 +136,18 @@ const UserList = ({ isSidebarOpen }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-6 overflow-x-hidden">
       <Toaster position="top-right" />
 
-      {/* Main container with a max width and centered (similar to courses.jsx) */}
-      <div className="max-w-6xl mx-auto w-full transition-all duration-300">
+      {/* Main container with a max width and centered */}
+      <div className="max-w-7xl mx-auto w-full transition-all duration-300">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => handleUserTypeChange("members")}
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "members"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700"
+                userType === "members" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
               }`}
             >
               Members ({members.length})
@@ -135,9 +155,7 @@ const UserList = ({ isSidebarOpen }) => {
             <button
               onClick={() => handleUserTypeChange("admins")}
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "admins"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-700"
+                userType === "admins" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
               }`}
             >
               Admins ({admins.length})
@@ -154,9 +172,12 @@ const UserList = ({ isSidebarOpen }) => {
               </button>
 
               {/* Mobile view: More Options for Export & Import */}
-              <div className="block sm:hidden relative">
+              <div className="block sm:hidden relative" ref={moreOptionsRef}>
                 <button
-                  onClick={() => setShowMoreOptions((prev) => !prev)}
+                  onClick={() => {
+                    setShowMoreOptions((prev) => !prev);
+                    setShowFilters(false);
+                  }}
                   className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
                 >
                   <FiMoreVertical className="text-lg" />
@@ -185,9 +206,12 @@ const UserList = ({ isSidebarOpen }) => {
             </div>
 
             {/* Filter Button */}
-            <div className="relative">
+            <div className="relative" ref={filterRef}>
               <button
-                onClick={() => setShowFilters((prev) => !prev)}
+                onClick={() => {
+                  setShowFilters((prev) => !prev);
+                  setShowMoreOptions(false);
+                }}
                 className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
               >
                 <FiFilter className="mr-2" /> Filter
@@ -223,13 +247,10 @@ const UserList = ({ isSidebarOpen }) => {
           Total {userType}: {filteredData.length}
         </div>
 
-        {/* For screens below lg, show card view (more fluid on iPad mini) */}
+        {/* Mobile View */}
         <div className="lg:hidden space-y-3">
           {paginatedData.map((user) => (
-            <div
-              key={user.id}
-              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
-            >
+            <div key={user.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
               <div className="flex items-start gap-3 mb-4">
                 <img
                   src={user.photo}
@@ -246,9 +267,7 @@ const UserList = ({ isSidebarOpen }) => {
                 <div className="flex items-center gap-2">
                   <span
                     className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                      user.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                      user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                     }`}
                   >
                     {user.status}
@@ -282,32 +301,18 @@ const UserList = ({ isSidebarOpen }) => {
           ))}
         </div>
 
-        {/* For screens lg and above, show table view */}
+        {/* Desktop Table */}
         <div className="hidden lg:block bg-white rounded-lg shadow-sm overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Photo
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Name
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Mobile
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Email
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Operations
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">
-                  Actions
-                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Photo</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Mobile</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Operations</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -320,21 +325,13 @@ const UserList = ({ isSidebarOpen }) => {
                       className="w-8 h-8 rounded-full object-cover"
                     />
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {user.name}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {user.mobile}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {user.email}
-                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{user.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{user.mobile}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
                   <td className="px-4 py-3">
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        user.status === "Active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                        user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                       }`}
                     >
                       {user.status}
@@ -417,61 +414,32 @@ const UserList = ({ isSidebarOpen }) => {
               >
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Name</label>
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="name" type="text" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Email</label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="email" type="email" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Mobile</label>
-                  <input
-                    name="mobile"
-                    type="text"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="mobile" type="text" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Photo URL</label>
-                  <input
-                    name="photo"
-                    type="text"
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="photo" type="text" className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Status</label>
-                  <select
-                    name="status"
-                    className="w-full border px-3 py-2 rounded"
-                  >
+                  <select name="status" className="w-full border px-3 py-2 rounded">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 bg-gray-200 rounded"
-                  >
+                  <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 bg-gray-200 rounded">
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
-                  >
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
                     Add
                   </button>
                 </div>
@@ -502,50 +470,23 @@ const UserList = ({ isSidebarOpen }) => {
               >
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Name</label>
-                  <input
-                    name="name"
-                    defaultValue={selectedUser.name}
-                    type="text"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="name" defaultValue={selectedUser.name} type="text" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Email</label>
-                  <input
-                    name="email"
-                    defaultValue={selectedUser.email}
-                    type="email"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="email" defaultValue={selectedUser.email} type="email" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Mobile</label>
-                  <input
-                    name="mobile"
-                    defaultValue={selectedUser.mobile}
-                    type="text"
-                    required
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="mobile" defaultValue={selectedUser.mobile} type="text" required className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Photo URL</label>
-                  <input
-                    name="photo"
-                    defaultValue={selectedUser.photo}
-                    type="text"
-                    className="w-full border px-3 py-2 rounded"
-                  />
+                  <input name="photo" defaultValue={selectedUser.photo} type="text" className="w-full border px-3 py-2 rounded" />
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm mb-1">Status</label>
-                  <select
-                    name="status"
-                    defaultValue={selectedUser.status}
-                    className="w-full border px-3 py-2 rounded"
-                  >
+                  <select name="status" defaultValue={selectedUser.status} className="w-full border px-3 py-2 rounded">
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
@@ -561,10 +502,7 @@ const UserList = ({ isSidebarOpen }) => {
                   >
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
-                  >
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
                     Save
                   </button>
                 </div>
@@ -579,8 +517,7 @@ const UserList = ({ isSidebarOpen }) => {
             <div className="bg-white p-6 rounded-lg w-96">
               <h2 className="text-xl mb-4">Confirm Delete</h2>
               <p>
-                Are you sure you want to delete{" "}
-                <strong>{selectedUser.name}</strong>?
+                Are you sure you want to delete <strong>{selectedUser.name}</strong>?
               </p>
               <div className="flex justify-end gap-2 mt-4">
                 <button
