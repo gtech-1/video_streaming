@@ -13,20 +13,12 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen pt-16 flex relative">
+    // Outer wrapper with dark mode background and top padding for the Navbar.
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 pt-16 flex relative">
       <Navbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      {/* Sidebar remains fixed */}
       <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-      {/* 
-          On screens >= xl (1280px), the main content will shift right
-          when sidebar is open. On screens below xl, it won’t shift, so
-          the sidebar overlays the content (like on mobile and iPad Pro).
-      */}
-      <div
-        className={`flex-1 transition-all p-4 ${
-          isSidebarOpen ? "xl:ml-64" : "xl:ml-20"
-        }`}
-      >
+      {/* Removed the extra padding class (p-4) from the inner container */}
+      <div className={`${isSidebarOpen ? "xl:ml-64" : "xl:ml-20"} flex-1 transition-all`}>
         <motion.div
           key={location.pathname}
           initial={{ opacity: 0 }}
@@ -36,7 +28,7 @@ const Home = () => {
           <Outlet />
         </motion.div>
       </div>
-      {/* Overlay appears on screens smaller than xl */}
+      {/* Overlay for smaller screens */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 xl:hidden"

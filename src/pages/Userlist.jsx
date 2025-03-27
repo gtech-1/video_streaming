@@ -136,10 +136,11 @@ const UserList = ({ isSidebarOpen }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 overflow-x-hidden">
+    // Outer wrapper: full viewport with dark mode background
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 overflow-x-hidden">
       <Toaster position="top-right" />
 
-      {/* Main container with a max width and centered */}
+      {/* Main container: centered and constrained */}
       <div className="max-w-7xl mx-auto w-full transition-all duration-300">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -147,7 +148,7 @@ const UserList = ({ isSidebarOpen }) => {
             <button
               onClick={() => handleUserTypeChange("members")}
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "members" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                userType === "members" ? "bg-blue-600 text-white" : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white"
               }`}
             >
               Members ({members.length})
@@ -155,7 +156,7 @@ const UserList = ({ isSidebarOpen }) => {
             <button
               onClick={() => handleUserTypeChange("admins")}
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "admins" ? "bg-blue-600 text-white" : "bg-white text-gray-700"
+                userType === "admins" ? "bg-blue-600 text-white" : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white"
               }`}
             >
               Admins ({admins.length})
@@ -164,9 +165,10 @@ const UserList = ({ isSidebarOpen }) => {
 
           <div className="flex flex-wrap gap-2 w-full sm:w-auto items-center">
             <div className="flex flex-wrap gap-2">
+              {/* Add Button */}
               <button
                 onClick={() => setShowAddModal(true)}
-                className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
+                className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <FaPlus className="mr-2" /> Add
               </button>
@@ -178,16 +180,16 @@ const UserList = ({ isSidebarOpen }) => {
                     setShowMoreOptions((prev) => !prev);
                     setShowFilters(false);
                   }}
-                  className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
+                  className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   <FiMoreVertical className="text-lg" />
                 </button>
                 {showMoreOptions && (
-                  <div className="absolute left-0 mt-2 w-40 bg-white shadow-md rounded-lg border border-gray-200 z-10">
-                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
+                  <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-700 z-10">
+                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
                       <FaDownload className="mr-2 inline-block" /> Export
                     </button>
-                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50">
+                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
                       <FaUpload className="mr-2 inline-block" /> Import
                     </button>
                   </div>
@@ -196,10 +198,10 @@ const UserList = ({ isSidebarOpen }) => {
 
               {/* Desktop view: Export & Import Buttons */}
               <div className="hidden sm:flex gap-2">
-                <button className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50">
+                <button className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700">
                   <FaDownload className="mr-2" /> Export
                 </button>
-                <button className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50">
+                <button className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700">
                   <FaUpload className="mr-2" /> Import
                 </button>
               </div>
@@ -212,28 +214,19 @@ const UserList = ({ isSidebarOpen }) => {
                   setShowFilters((prev) => !prev);
                   setShowMoreOptions(false);
                 }}
-                className="bg-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50"
+                className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 <FiFilter className="mr-2" /> Filter
               </button>
               {showFilters && (
-                <div className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-lg border border-gray-200 z-10">
-                  <button
-                    onClick={() => handleFilterStatus("all")}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                  >
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-700 z-10">
+                  <button onClick={() => handleFilterStatus("all")} className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
                     All
                   </button>
-                  <button
-                    onClick={() => handleFilterStatus("active")}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                  >
+                  <button onClick={() => handleFilterStatus("active")} className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
                     Active
                   </button>
-                  <button
-                    onClick={() => handleFilterStatus("inactive")}
-                    className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                  >
+                  <button onClick={() => handleFilterStatus("inactive")} className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
                     Inactive
                   </button>
                 </div>
@@ -243,14 +236,16 @@ const UserList = ({ isSidebarOpen }) => {
         </div>
 
         {/* User Count */}
-        <div className="bg-white p-3 rounded-lg mb-4 text-sm shadow-sm">
-          Total {userType}: {filteredData.length}
+        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg mb-4 text-sm shadow-sm">
+          <span className="text-gray-900 dark:text-white">
+            Total {userType}: {filteredData.length}
+          </span>
         </div>
 
-        {/* Mobile View */}
+        {/* Mobile View (Cards) */}
         <div className="lg:hidden space-y-3">
           {paginatedData.map((user) => (
-            <div key={user.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+            <div key={user.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
               <div className="flex items-start gap-3 mb-4">
                 <img
                   src={user.photo}
@@ -258,36 +253,26 @@ const UserList = ({ isSidebarOpen }) => {
                   className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                 />
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">{user.name}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{user.email}</p>
-                  <p className="text-sm text-gray-600 mt-1">{user.mobile}</p>
+                  <h3 className="font-medium text-gray-900 dark:text-white">{user.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{user.email}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{user.mobile}</p>
                 </div>
               </div>
-              <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+              <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-700 pt-3">
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                      user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}
-                  >
+                  <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                     {user.status}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowEditModal(true);
-                    }}
+                    onClick={() => { setSelectedUser(user); setShowEditModal(true); }}
                     className="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50"
                   >
                     <FaEdit className="text-base" />
                   </button>
                   <button
-                    onClick={() => {
-                      setSelectedUser(user);
-                      setShowDeleteModal(true);
-                    }}
+                    onClick={() => { setSelectedUser(user); setShowDeleteModal(true); }}
                     className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50"
                   >
                     <FaTrash className="text-base" />
@@ -301,58 +286,44 @@ const UserList = ({ isSidebarOpen }) => {
           ))}
         </div>
 
-        {/* Desktop Table */}
-        <div className="hidden lg:block bg-white rounded-lg shadow-sm overflow-x-auto">
+        {/* Desktop View (Table) */}
+        <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Photo</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Name</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Mobile</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Email</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Operations</th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Photo</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Name</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Mobile</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Email</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Status</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Operations</th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {paginatedData.map((user) => (
                 <tr key={user.id}>
                   <td className="px-4 py-3">
-                    <img
-                      src={user.photo}
-                      alt={user.name}
-                      className="w-8 h-8 rounded-full object-cover"
-                    />
+                    <img src={user.photo} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">{user.name}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{user.mobile}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{user.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{user.mobile}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{user.email}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                      }`}
-                    >
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${user.status === "Active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                       {user.status}
                     </span>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowEditModal(true);
-                        }}
+                        onClick={() => { setSelectedUser(user); setShowEditModal(true); }}
                         className="text-blue-600 hover:text-blue-800 p-1.5 rounded-lg hover:bg-blue-50"
                       >
                         <FaEdit />
                       </button>
                       <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setShowDeleteModal(true);
-                        }}
+                        onClick={() => { setSelectedUser(user); setShowDeleteModal(true); }}
                         className="text-red-600 hover:text-red-800 p-1.5 rounded-lg hover:bg-red-50"
                       >
                         <FaTrash />
@@ -376,17 +347,17 @@ const UserList = ({ isSidebarOpen }) => {
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FiChevronLeft className="text-sm" /> Previous
             </button>
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1 px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next <FiChevronRight className="text-sm" />
             </button>
@@ -396,8 +367,8 @@ const UserList = ({ isSidebarOpen }) => {
         {/* Add User Modal */}
         {showAddModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4">Add User</h2>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">Add User</h2>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -413,30 +384,56 @@ const UserList = ({ isSidebarOpen }) => {
                 }}
               >
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Name</label>
-                  <input name="name" type="text" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Name</label>
+                  <input
+                    name="name"
+                    type="text"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Email</label>
-                  <input name="email" type="email" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Mobile</label>
-                  <input name="mobile" type="text" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Mobile</label>
+                  <input
+                    name="mobile"
+                    type="text"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Photo URL</label>
-                  <input name="photo" type="text" className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Photo URL</label>
+                  <input
+                    name="photo"
+                    type="text"
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Status</label>
-                  <select name="status" className="w-full border px-3 py-2 rounded">
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Status</label>
+                  <select
+                    name="status"
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
                 <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 bg-gray-200 rounded">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="px-4 py-2 bg-gray-200 rounded"
+                  >
                     Cancel
                   </button>
                   <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
@@ -451,8 +448,8 @@ const UserList = ({ isSidebarOpen }) => {
         {/* Edit User Modal */}
         {showEditModal && selectedUser && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4">Edit User</h2>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">Edit User</h2>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -469,24 +466,51 @@ const UserList = ({ isSidebarOpen }) => {
                 }}
               >
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Name</label>
-                  <input name="name" defaultValue={selectedUser.name} type="text" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Name</label>
+                  <input
+                    name="name"
+                    defaultValue={selectedUser.name}
+                    type="text"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Email</label>
-                  <input name="email" defaultValue={selectedUser.email} type="email" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Email</label>
+                  <input
+                    name="email"
+                    defaultValue={selectedUser.email}
+                    type="email"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Mobile</label>
-                  <input name="mobile" defaultValue={selectedUser.mobile} type="text" required className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Mobile</label>
+                  <input
+                    name="mobile"
+                    defaultValue={selectedUser.mobile}
+                    type="text"
+                    required
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Photo URL</label>
-                  <input name="photo" defaultValue={selectedUser.photo} type="text" className="w-full border px-3 py-2 rounded" />
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Photo URL</label>
+                  <input
+                    name="photo"
+                    defaultValue={selectedUser.photo}
+                    type="text"
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm mb-1">Status</label>
-                  <select name="status" defaultValue={selectedUser.status} className="w-full border px-3 py-2 rounded">
+                  <label className="block text-sm mb-1 text-gray-900 dark:text-white">Status</label>
+                  <select
+                    name="status"
+                    defaultValue={selectedUser.status}
+                    className="w-full border px-3 py-2 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  >
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
@@ -514,9 +538,9 @@ const UserList = ({ isSidebarOpen }) => {
         {/* Delete Confirmation Modal */}
         {showDeleteModal && selectedUser && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4">Confirm Delete</h2>
-              <p>
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
+              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">Confirm Delete</h2>
+              <p className="text-gray-900 dark:text-white">
                 Are you sure you want to delete <strong>{selectedUser.name}</strong>?
               </p>
               <div className="flex justify-end gap-2 mt-4">

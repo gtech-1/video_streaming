@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Bell, ChevronDown, Globe, Search, User, Menu, X } from "lucide-react";
+import { Bell, ChevronDown, Globe, Search, User, Menu, X, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
-
-import { Link } from "react-router-dom";
-
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleDarkMode } from "../redux/themeSlice";
 
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
@@ -23,7 +22,9 @@ const useOutsideClick = (ref, callback) => {
 };
 
 const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme.darkMode);
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -44,10 +45,10 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     toggleSidebar();
   };
 
-   const handleLogout =()=>{
+  const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/");
-   }
+  };
 
   return (
     <nav className="fixed w-full top-0 z-10 bg-gray-900 shadow-md text-white px-4 sm:px-6 py-2 flex items-center justify-between">
@@ -63,12 +64,12 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
       <div className="flex items-center space-x-4 sm:space-x-6 ml-auto relative w-full justify-end">
         {/* Desktop Search */}
         {!isSearchOpen && (
-          <div className="hidden sm:flex items-center bg-gray-800 text-gray-100 rounded-full px-3 py-1 shadow-lg w-[300px] transition-all duration-300 ease-in-out hover:scale-105">
+          <div className="hidden sm:flex items-center bg-gray-800 rounded-full px-3 py-1 shadow-lg w-[300px] transition-all duration-300 ease-in-out hover:scale-105">
             <Search className="text-gray-400 mr-3" size={18} />
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400 rounded-md"
+              className="w-full bg-transparent focus:outline-none text-white placeholder-gray-400 rounded-md"
             />
           </div>
         )}
@@ -80,14 +81,14 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
             initial={{ width: "50px", opacity: 0 }}
             animate={{ width: "calc(100% - 80px)", opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-800 text-gray-100 rounded-md px-3 py-1 shadow-lg flex items-center sm:hidden"
+            className="absolute left-1/2 transform -translate-x-1/2 bg-gray-800 rounded-md px-3 py-1 shadow-lg flex items-center sm:hidden"
             style={{ maxWidth: "600px" }}
           >
             <Search className="text-gray-400 mr-2" size={18} />
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent focus:outline-none text-gray-100 placeholder-gray-400"
+              className="w-full bg-transparent focus:outline-none text-white placeholder-gray-400"
               autoFocus
             />
             <button onClick={() => setIsSearchOpen(false)}>
@@ -103,6 +104,11 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         {/* Other Icons (Hidden on Mobile When Search is Open) */}
         {!isSearchOpen && (
           <div className="flex items-center space-x-4">
+            {/* Dark Mode Toggle */}
+            <button onClick={() => dispatch(toggleDarkMode())} className="p-2 rounded bg-gray-200">
+              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-800" />}
+            </button>
+
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
               <button onClick={() => setIsNotifOpen(!isNotifOpen)} className="relative flex items-center justify-center">
@@ -162,10 +168,12 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                   <ul className="p-2">
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      <Link to="/home/dashboard">Dashboard</Link> {/* ✅ Link added here */}
+                      <Link to="/home/dashboard">Dashboard</Link>
                     </li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Settings</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>
+                      Logout
+                    </li>
                   </ul>
                 </motion.div>
               )}
@@ -178,5 +186,3 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
 };
 
 export default Navbar;
-
-

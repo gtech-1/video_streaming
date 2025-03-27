@@ -6,7 +6,7 @@ import MenuPage from "./pages/MenuPage";
 import HomePage from "./pages/HomePage";
 import Dashboard from "./components/Dashboard";
 import CourseVideos from "./components/CourseVideos";
-import UserList from "./pages/UserList"; // Ensure correct import path
+import UserList from "./pages/Userlist"; // Ensure correct import path
 
 const router = createBrowserRouter([
   { path: "/", element: <SignIn /> },
