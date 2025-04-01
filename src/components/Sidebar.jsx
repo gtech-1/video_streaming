@@ -164,13 +164,13 @@ const SidebarContent = ({
   return (
     <div className="overflow-y-auto flex-1 mt-2 px-2">
       <nav className="space-y-1">
-        <NavItem
+        {/* <NavItem
           icon={<FaHome size={18} />}
           text="Home"
           isSidebarOpen={isSidebarOpen}
           path="/home/homepage"
           toggleSidebar={toggleSidebar}
-        />
+        /> */}
         <NavItem
           icon={<HiOutlineViewGrid size={18} />}
           text="Dashboard"
