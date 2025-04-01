@@ -10,13 +10,11 @@ import {
   Tooltip,
 } from "chart.js";
 
-
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
 
 const CgpaLineGraph = () => {
-  // Semesters & CGPA data
   const semesters = ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6"];
-  const cgpaData = [9.0, 7.8, 8.3, 9.0, 8.1, 8.5]; // Sample CGPA Data
+  const cgpaData = [9.0, 7.8, 8.3, 9.0, 8.1, 8.5];
 
   const data = {
     labels: semesters,
@@ -24,11 +22,11 @@ const CgpaLineGraph = () => {
       {
         label: "CGPA",
         data: cgpaData,
-        borderColor: "#4F46E5", // Indigo Blue Line
-        backgroundColor: "rgba(79, 70, 229, 0.2)", // Light Blue Fill
+        borderColor: "#4F46E5", // Indigo
+        backgroundColor: "rgba(79, 70, 229, 0.2)",
         pointBackgroundColor: "#4F46E5",
         pointBorderColor: "#fff",
-        tension: 0.4, // Smooth Curve
+        tension: 0.4,
       },
     ],
   };
@@ -38,16 +36,25 @@ const CgpaLineGraph = () => {
     maintainAspectRatio: false,
     scales: {
       x: {
-        ticks: { color: "#374151", font: { size: 10 } }, // Smaller font for mobile
+        ticks: {
+          color: "#9CA3AF", // Tailwind's text-gray-400
+          font: { size: 10 },
+        },
         grid: { display: false },
       },
       y: {
-        ticks: { color: "#374151", beginAtZero: false, min: 5, max: 10, font: { size: 10 } }, // Smaller font for mobile
-        grid: { color: "rgba(209, 213, 219, 0.5)" },
+        ticks: {
+          color: "#9CA3AF",
+          beginAtZero: false,
+          min: 5,
+          max: 10,
+          font: { size: 10 },
+        },
+        grid: { color: "rgba(107, 114, 128, 0.2)" }, // Tailwind gray-500
       },
     },
     plugins: {
-      legend: { display: false }, // Hide legend
+      legend: { display: false },
       tooltip: {
         callbacks: {
           label: (tooltipItem) => `CGPA: ${tooltipItem.raw}`,
@@ -55,13 +62,13 @@ const CgpaLineGraph = () => {
       },
     },
     animation: {
-      duration: 1000, // 1 second animation
+      duration: 1000,
     },
   };
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md">
-      <h2 className="text-gray-700 text-base sm:text-lg font-semibold mb-4">
+    <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md transition-colors duration-300">
+      <h2 className="text-gray-700 dark:text-white text-base sm:text-lg font-semibold mb-4">
         📈 CGPA Over Semesters
       </h2>
       <div className="h-48 sm:h-64">
@@ -72,4 +79,5 @@ const CgpaLineGraph = () => {
 };
 
 export default CgpaLineGraph;
+
 

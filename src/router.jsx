@@ -1,27 +1,29 @@
-import { createBrowserRouter } from "react-router-dom";
-import Home from "./pages/Home";
-import Login from "./pages/Auth/Login";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import Landing from "./pages/Landing";
 import SignIn from "./pages/Auth/SignIn";
+import Login from "./pages/Auth/Login";
+import Home from "./pages/Home";
 import MenuPage from "./pages/MenuPage";
-import HomePage from "./pages/HomePage";
 import Dashboard from "./components/Dashboard";
 import CourseVideos from "./components/CourseVideos";
-import UserList from "./pages/Userlist"; // Ensure correct import path
+import UserList from "./pages/Userlist";
 
 const router = createBrowserRouter([
-  { path: "/", element: <SignIn /> },
+  { path: "/", element: <Landing /> },            
+  { path: "/signin", element: <SignIn /> },           
   { path: "/login", element: <Login /> },
   {
     path: "/home",
     element: <Home />,
     children: [
-      { path: "homepage", element: <HomePage /> },
+      { index: true, element: <Navigate to="dashboard" /> },
       { path: "menu", element: <MenuPage /> },
       { path: "dashboard", element: <Dashboard /> },
-      { path: "userlist", element: <UserList /> }, // Moved inside Home
+      { path: "userlist", element: <UserList /> },
       { path: "courses/:id", element: <CourseVideos /> },
     ],
   },
 ]);
 
 export default router;
+

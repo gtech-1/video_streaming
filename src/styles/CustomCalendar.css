@@ -1,0 +1,32 @@
+/* Base styling for react-calendar */
+.custom-calendar {
+    background-color: transparent;
+    color: inherit;
+    border: none;
+  }
+  
+  /* Light mode */
+  .custom-calendar abbr {
+    color: #374151; /* text-gray-700 */
+  }
+  
+  /* Dark mode support */
+  .dark .custom-calendar {
+    background-color: transparent;
+    color: #d1d5db; /* text-gray-300 */
+  }
+  
+  .dark .custom-calendar abbr {
+    color: #d1d5db;
+  }
+  
+  .dark .custom-calendar .react-calendar__tile--active {
+    background-color: #2563eb; /* blue-600 */
+    color: #fff;
+  }
+  
+  .dark .custom-calendar .react-calendar__tile--now {
+    background-color: #4b5563; /* gray-600 */
+    color: #fff;
+  }
+  
