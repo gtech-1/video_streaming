@@ -105,9 +105,14 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         {!isSearchOpen && (
           <div className="flex items-center space-x-4">
             {/* Dark Mode Toggle */}
-            <button onClick={() => dispatch(toggleDarkMode())} className="p-2 rounded bg-gray-200">
-              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-800" />}
-            </button>
+            <button 
+              onClick={() => dispatch(toggleDarkMode())} 
+              className="p-2 rounded bg-gray-200 dark:bg-gray-700"
+              >
+               {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-800" />}
+              </button>
+
+            
 
             {/* Notifications */}
             <div className="relative" ref={notifRef}>

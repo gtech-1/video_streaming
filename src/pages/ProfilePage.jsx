@@ -1,9 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaLock, FaBook, FaHistory, FaCamera, FaFacebook, FaTwitter, FaLinkedin, FaInstagram } from 'react-icons/fa';
+import { FaUser, FaLock, FaBook, FaHistory, FaCamera, FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaBars, FaChevronDown } from 'react-icons/fa';
 
 function ProfilePage() {
   const [activeSection, setActiveSection] = useState('profile');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
   
   // Mock user data - in a real app this would come from an API or context
   const userData = {
@@ -31,6 +47,7 @@ function ProfilePage() {
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
+    setDropdownOpen(false);
   };
 
   // Navigation navbar items
@@ -279,8 +296,9 @@ function ProfilePage() {
       <div className="max-w-7xl mx-auto">
         {/* Top Navbar */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between p-4">
-            <div className="flex items-center mb-4 sm:mb-0">
+          <div className="flex items-center justify-between p-4">
+            {/* User Info - Always visible */}
+            <div className="flex items-center">
               <img 
                 src={userData.photoUrl} 
                 alt="Profile" 
@@ -292,12 +310,41 @@ function ProfilePage() {
               </div>
             </div>
             
-            {/* Navigation Links */}
-            <nav className="flex flex-wrap justify-center sm:justify-end space-x-1 sm:space-x-2">
+            {/* Dropdown for Mobile / Small Screens */}
+            <div className="sm:hidden relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center justify-center p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 shadow-sm"
+              >
+                <FaBars size={18} />
+              </button>
+              
+              {dropdownOpen && (
+                <div className="fixed right-4 top-24 w-52 bg-white dark:bg-gray-800 rounded-md shadow-xl py-1 z-50 border border-gray-200 dark:border-gray-700">
+                  {navItems.map(item => (
+                    <button
+                      key={item.id}
+                      className={`flex items-center w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                        activeSection === item.id 
+                          ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' 
+                          : 'text-gray-700 dark:text-gray-300'
+                      }`}
+                      onClick={() => handleSectionChange(item.id)}
+                    >
+                      <span className="mr-3 text-blue-500">{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Regular Navigation for Desktop / Larger Screens */}
+            <nav className="hidden sm:flex flex-wrap justify-end space-x-2">
               {navItems.map(item => (
                 <button
                   key={item.id}
-                  className={`flex items-center px-3 py-2 my-1 rounded-lg transition-colors ${
+                  className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                     activeSection === item.id 
                       ? 'bg-blue-500 text-white' 
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'

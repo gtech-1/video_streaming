@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import {
@@ -10,40 +9,28 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
+import { useSelector } from "react-redux";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
 
 const StatisticsChart = () => {
   const chartRef = useRef(null);
-
-  // Create gradient effect for the line chart
-  useEffect(() => {
-    if (chartRef.current) {
-      const chart = chartRef.current;
-      const ctx = chart.ctx;
-      const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-      gradient.addColorStop(0, "rgba(59, 130, 246, 0.6)"); // Light blue at top
-      gradient.addColorStop(1, "rgba(255, 255, 255, 0)"); // Fade to transparent
-
-      chart.data.datasets[0].backgroundColor = gradient;
-      chart.update();
-    }
-  }, []);
+  const darkMode = useSelector((state) => state.theme.darkMode); // Detect dark mode
 
   const data = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     datasets: [
       {
         label: "Hours Spent",
-        data: [2, 4, 9, 3, 5, 2, 4], // Example Data
+        data: [2, 4, 9, 3, 5, 2, 4],
         fill: true,
-        borderColor: "#3B82F6", // Bright Blue Line
-        backgroundColor: "rgba(59, 130, 246, 0.3)", // Will be replaced by gradient
-        tension: 0.4, // Smooth curve effect
+        borderColor: "#3B82F6",
+        backgroundColor: "rgba(59, 130, 246, 0.3)", // default; will override below
+        tension: 0.4,
         pointBackgroundColor: "#3B82F6",
         pointBorderColor: "#fff",
-        pointRadius: 4, // Slightly smaller points on mobile
+        pointRadius: 4,
       },
     ],
   };
@@ -53,23 +40,56 @@ const StatisticsChart = () => {
     maintainAspectRatio: false,
     scales: {
       x: {
-        ticks: { color: "#374151", font: { size: 10 } }, // Smaller font for mobile
-        grid: { color: "rgba(209, 213, 219, 0.5)" }, // Light gray grid lines
+        ticks: {
+          color: darkMode ? "#D1D5DB" : "#6B7280", // light gray in dark, gray-500 in light
+          font: { size: 10 },
+        },
+        grid: {
+          color: darkMode ? "rgba(255,255,255,0.1)" : "rgba(107,114,128,0.2)",
+        },
       },
       y: {
-        ticks: { color: "#374151", stepSize: 2, font: { size: 10 } }, // Smaller font for mobile
-        grid: { color: "rgba(209, 213, 219, 0.5)" }, // Light gray grid lines
+        ticks: {
+          color: darkMode ? "#D1D5DB" : "#6B7280",
+          font: { size: 10 },
+        },
+        grid: {
+          color: darkMode ? "rgba(255,255,255,0.1)" : "rgba(107,114,128,0.2)",
+        },
       },
     },
     plugins: {
-      legend: { display: false }, // Hide legend
+      legend: { display: false },
     },
   };
 
+  useEffect(() => {
+    if (chartRef.current && chartRef.current.canvas) {
+      const chartInstance = chartRef.current;
+      const ctx = chartInstance.canvas.getContext("2d");
+      const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+
+      if (darkMode) {
+        gradient.addColorStop(0, "rgba(59, 130, 246, 0.5)");
+        gradient.addColorStop(1, "rgba(30, 41, 59, 0.0)"); // darker stop
+      } else {
+        gradient.addColorStop(0, "rgba(59, 130, 246, 0.6)");
+        gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+      }
+
+      chartInstance.data.datasets[0].backgroundColor = gradient;
+      chartInstance.update();
+    }
+  }, [darkMode]);
+
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md">
-      <h2 className="text-gray-800 text-base sm:text-lg font-semibold">Statistics</h2>
-      <p className="text-gray-600 text-xs sm:text-sm">Hours Spent Last Week</p>
+    <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md transition-colors duration-300">
+      <h2 className="text-gray-800 dark:text-white text-base sm:text-lg font-semibold">
+        Statistics
+      </h2>
+      <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
+        Hours Spent Last Week
+      </p>
       <div className="h-40 sm:h-48">
         <Line ref={chartRef} data={data} options={options} />
       </div>
