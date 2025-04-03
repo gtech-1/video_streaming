@@ -1,0 +1,23 @@
+{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "photoUrl": "https://randomuser.me/api/portraits/men/24.jpg",
+    "address": "123 Main Street, New York, NY 10001",
+    "dob": "1990-01-01",
+    "socialMedia": {
+      "facebook": "johndoe",
+      "twitter": "johndoe",
+      "linkedin": "johndoe",
+      "instagram": "johndoe"
+    },
+    "courses": [
+      { "id": 1, "name": "Python Programming", "progress": 75 },
+      { "id": 2, "name": "Web Development", "progress": 50 },
+      { "id": 3, "name": "Data Structures", "progress": 90 }
+    ],
+    "loginActivity": {
+      "firstLogin": "2023-01-01 09:30 AM",
+      "lastLogin": "2024-04-02 10:15 AM"
+    }
+  }
+  
