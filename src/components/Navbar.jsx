@@ -171,7 +171,9 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                   className="absolute right-0 mt-2 min-w-[150px] bg-white text-gray-900 border rounded-lg shadow-lg"
                 >
                   <ul className="p-2">
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                      <Link to="/home/profile">Profile</Link>
+                    </li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                       <Link to="/home/dashboard">Dashboard</Link>
                     </li>

@@ -6,7 +6,8 @@ import Home from "./pages/Home";
 import MenuPage from "./pages/MenuPage";
 import Dashboard from "./components/Dashboard";
 import CourseVideos from "./components/CourseVideos";
-import UserList from "./pages/Userlist";
+import UserList from "./pages/Userlist"; // Ensure correct import path
+import ProfilePage from "./pages/ProfilePage"; // Import the ProfilePage component
 
 const router = createBrowserRouter([
   { path: "/", element: <Landing /> },            
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <Dashboard /> },
       { path: "userlist", element: <UserList /> },
       { path: "courses/:id", element: <CourseVideos /> },
+      { path: "profile", element: <ProfilePage /> }, // Added ProfilePage as a child route
     ],
   },
 ]);
