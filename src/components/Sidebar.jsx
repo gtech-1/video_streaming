@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { FaHome, FaUsers, FaUserEdit, FaUserMinus } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { HiOutlineViewGrid } from "react-icons/hi";
@@ -29,8 +29,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const sidebarRef = useRef(null);
 
   // Compute variants based on whether we're on desktop or mobile.
-  // Desktop: closed state is still visible (x: 0, width: 60) so icons remain.
-  // Mobile: closed state slides off-screen (x: -250) and uses a spring with no bounce.
   const variants = isDesktop
     ? {
         open: {
@@ -80,7 +78,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   if (!isDesktop && !isSidebarOpen) {
     return (
       <AnimatePresence mode="wait">
-        {/* When isSidebarOpen becomes false, the exit animation will run */}
         <motion.div
           ref={sidebarRef}
           initial="open"
@@ -104,7 +101,6 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     );
   }
 
-  // On desktop (or mobile when open), render normally:
   return isDesktop ? (
     <motion.div
       ref={sidebarRef}
@@ -164,13 +160,6 @@ const SidebarContent = ({
   return (
     <div className="overflow-y-auto flex-1 mt-2 px-2">
       <nav className="space-y-1">
-        {/* <NavItem
-          icon={<FaHome size={18} />}
-          text="Home"
-          isSidebarOpen={isSidebarOpen}
-          path="/home/homepage"
-          toggleSidebar={toggleSidebar}
-        /> */}
         <NavItem
           icon={<HiOutlineViewGrid size={18} />}
           text="Dashboard"
@@ -265,6 +254,7 @@ const SidebarContent = ({
   );
 };
 
+// Updated NavItem using NavLink with a slightly lighter active highlight
 const NavItem = ({ icon, text, isSidebarOpen, path, toggleSidebar }) => {
   const handleClick = () => {
     if (window.innerWidth < 640 && toggleSidebar) {
@@ -273,16 +263,50 @@ const NavItem = ({ icon, text, isSidebarOpen, path, toggleSidebar }) => {
   };
 
   return (
-    <Link
+    <NavLink
       to={path}
       onClick={handleClick}
-      className={`flex items-center p-[6px] rounded hover:bg-gray-700 transition-all ${
-        isSidebarOpen ? "justify-start" : "justify-center"
-      }`}
+      className={({ isActive }) =>
+        `flex items-center p-[6px] rounded transition-all ${
+          isSidebarOpen ? "justify-start" : "justify-center"
+        } ${
+          isActive
+            ? "bg-gray-800 border-l-4 border-gray-600"
+            : "hover:bg-gray-700"
+        }`
+      }
     >
       <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
       {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
-    </Link>
+    </NavLink>
+  );
+};
+
+// Updated SubNavItem using NavLink with a slightly lighter active highlight
+const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
+  const handleClick = () => {
+    if (window.innerWidth < 640 && toggleSidebar) {
+      toggleSidebar();
+    }
+  };
+
+  return (
+    <NavLink
+      to={path}
+      onClick={handleClick}
+      className={({ isActive }) =>
+        `flex items-center p-[5px] rounded transition-all ${
+          isActive
+            ? "bg-gray-800 border-l-4 border-gray-600"
+            : "hover:bg-gray-700"
+        }`
+      }
+    >
+      {icon && (
+        <div className="w-5 h-5 flex items-center justify-center">{icon}</div>
+      )}
+      <span className="text-[14px] ml-2">{text}</span>
+    </NavLink>
   );
 };
 
@@ -324,26 +348,5 @@ const DropdownItem = ({
     )}
   </div>
 );
-
-const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
-  const handleClick = () => {
-    if (window.innerWidth < 640 && toggleSidebar) {
-      toggleSidebar();
-    }
-  };
-
-  return (
-    <Link
-      to={path}
-      onClick={handleClick}
-      className="flex items-center p-[5px] rounded hover:bg-gray-700 transition-all"
-    >
-      {icon && (
-        <div className="w-5 h-5 flex items-center justify-center">{icon}</div>
-      )}
-      <span className="text-[14px] ml-2">{text}</span>
-    </Link>
-  );
-};
 
 export default Sidebar;
