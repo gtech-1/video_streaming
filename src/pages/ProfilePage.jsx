@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import {
   FaUser,
   FaLock,
@@ -11,11 +12,17 @@ import {
   FaTwitter,
   FaLinkedin,
   FaInstagram,
-  FaBars
+  FaBars,
+  FaSignOutAlt,
+  FaPencilAlt,
+  FaCheck,
+  FaTimes
 } from 'react-icons/fa';
 
 // Import initial user data from JSON file
 import initialUserData from '../components/ProfileInfo.json';
+// Import banner image
+import bannerImage from '../assets/banner.jpg';
 
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
@@ -34,55 +41,224 @@ const useOutsideClick = (ref, callback) => {
 
 // ============== ProfileInfoSection Component ==============
 const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, fileInputRef }) => {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
+  // Track which field is being edited
+  const [editingField, setEditingField] = useState(null);
+  
+  // Temporary state for edited values
+  const [editValues, setEditValues] = useState({
+    name: '',
+    email: '',
+    address: '',
+    phone: '',
+    dob: '',
+    socialMedia: {
+      facebook: '',
+      twitter: '',
+      linkedin: '',
+      instagram: ''
+    }
+  });
+
+  // Initialize edit values when a field is set to edit mode
+  const handleEditClick = (field) => {
+    setEditValues({
+      ...editValues,
+      [field]: field === 'socialMedia' ? {...profileData.socialMedia} : profileData[field]
+    });
+    setEditingField(field);
   };
 
-  const handleSocialChange = (e) => {
-    const { name, value } = e.target;
+  // Handle input changes
+  const handleInputChange = (e, field, subfield = null) => {
+    if (subfield) {
+      setEditValues(prev => ({
+        ...prev,
+        socialMedia: {
+          ...prev.socialMedia,
+          [subfield]: e.target.value
+        }
+      }));
+    } else {
+      setEditValues(prev => ({
+        ...prev,
+        [field]: e.target.value
+      }));
+    }
+  };
+
+  // Save the edited field
+  const handleSaveField = (field) => {
     setProfileData(prev => ({
       ...prev,
-      socialMedia: { ...prev.socialMedia, [name]: value }
+      ...(field === 'socialMedia' 
+        ? { socialMedia: editValues.socialMedia } 
+        : { [field]: editValues[field] })
     }));
+    
+    setEditingField(null);
+    toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated successfully!`);
   };
+
+  // Cancel editing
+  const handleCancelEdit = () => setEditingField(null);
 
   const handlePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setProfileData(prev => ({ ...prev, photoUrl: imageUrl }));
+      toast.success("Profile picture updated successfully!");
     }
   };
 
-  const handleSaveChanges = () => {
-    console.log("Profile updated:", profileData);
-    toast.success("Profile info saved successfully!");
-  };
+  // Render an editable field section
+  const renderFieldSection = (field, title, inputType = 'text', inputProps = {}) => (
+    <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
+        {editingField !== field && (
+          <button 
+            onClick={() => handleEditClick(field)} 
+            className="text-blue-600 dark:text-blue-400"
+          >
+            <FaPencilAlt size={16} />
+          </button>
+        )}
+      </div>
+      
+      {editingField === field ? (
+        <div className="mt-2">
+          {inputType === 'textarea' ? (
+            <textarea 
+              value={editValues[field]}
+              onChange={(e) => handleInputChange(e, field)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              rows="3"
+              {...inputProps}
+            />
+          ) : (
+            <input 
+              type={inputType}
+              value={editValues[field]}
+              onChange={(e) => handleInputChange(e, field)}
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              {...inputProps}
+            />
+          )}
+          <div className="flex space-x-2 mt-2">
+            <button 
+              onClick={() => handleSaveField(field)}
+              className="flex items-center justify-center px-3 py-1 bg-green-500 text-white rounded-md text-sm"
+            >
+              <FaCheck className="mr-1" size={12} /> Save
+            </button>
+            <button 
+              onClick={handleCancelEdit}
+              className="flex items-center justify-center px-3 py-1 bg-red-500 text-white rounded-md text-sm"
+            >
+              <FaTimes className="mr-1" size={12} /> Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-gray-700 dark:text-gray-300 mt-1">
+          {field === 'phone' ? (profileData[field] || "+1 (234) 567-8901") : profileData[field]}
+        </p>
+      )}
+    </div>
+  );
 
-  const handleResetProfile = () => {
-    if (window.confirm("Are you sure you want to reset your profile info?")) {
-      setProfileData(initialUserData);
-      toast.success("Profile information has been reset");
-    }
-  };
+  // Render social media section
+  const renderSocialMediaSection = () => (
+    <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Social Media</h3>
+        {editingField !== 'socialMedia' && (
+          <button 
+            onClick={() => handleEditClick('socialMedia')} 
+            className="text-blue-600 dark:text-blue-400"
+          >
+            <FaPencilAlt size={16} />
+          </button>
+        )}
+      </div>
+      
+      {editingField === 'socialMedia' ? (
+        <div className="mt-2 space-y-3">
+          {['facebook', 'twitter', 'linkedin', 'instagram'].map(platform => (
+            <div key={platform} className="flex items-center">
+              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-xl mr-3" />}
+              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-xl mr-3" />}
+              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-xl mr-3" />}
+              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-xl mr-3" />}
+              <input 
+                type="text" 
+                value={editValues.socialMedia[platform]}
+                onChange={(e) => handleInputChange(e, 'socialMedia', platform)}
+                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
+              />
+            </div>
+          ))}
+          
+          <div className="flex space-x-2 mt-2">
+            <button 
+              onClick={() => handleSaveField('socialMedia')}
+              className="flex items-center justify-center px-3 py-1 bg-green-500 text-white rounded-md text-sm"
+            >
+              <FaCheck className="mr-1" size={12} /> Save
+            </button>
+            <button 
+              onClick={handleCancelEdit}
+              className="flex items-center justify-center px-3 py-1 bg-red-500 text-white rounded-md text-sm"
+            >
+              <FaTimes className="mr-1" size={12} /> Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {['facebook', 'twitter', 'linkedin', 'instagram'].map(platform => (
+            <div key={platform} className="flex items-center">
+              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-xl mr-3" />}
+              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-xl mr-3" />}
+              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-xl mr-3" />}
+              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-xl mr-3" />}
+              <a 
+                href={profileData.socialMedia[platform]} 
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                {profileData.socialMedia[platform] || 'Not connected'}
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profile Information</h2>
-
-      <div className="flex flex-col items-center mb-6">
-        <div className="relative">
-          <img 
-            src={profileData.photoUrl} 
-            alt="Profile" 
-            className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
-          />
+      
+      {/* Profile Photo Section */}
+      <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Profile photo</h3>
+        </div>
+        <div className="flex items-center">
+          <div className="mr-4">
+            <img 
+              src={profileData.photoUrl} 
+              alt="Profile" 
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          </div>
           <button
             onClick={() => fileInputRef.current.click()}
-            className="absolute bottom-0 right-0 bg-blue-500 p-2 rounded-full text-white"
+            className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white text-sm rounded-md transition-colors"
           >
-            <FaCamera size={16} />
+            Update
           </button>
           <input 
             type="file" 
@@ -92,126 +268,17 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
             className="hidden"
           />
         </div>
-        <p className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
-          {profileData.name}
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
-            <input 
-              type="text" 
-              name="name"
-              value={profileData.name} 
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-            <input 
-              type="email" 
-              name="email"
-              value={profileData.email} 
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
-            <textarea 
-              name="address"
-              value={profileData.address} 
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
-            <input 
-              type="date" 
-              name="dob"
-              value={profileData.dob} 
-              onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Social Media</label>
-
-            <div className="flex items-center">
-              <FaFacebook className="text-blue-600 mr-2" />
-              <input 
-                type="text" 
-                name="facebook"
-                value={profileData.socialMedia.facebook} 
-                onChange={handleSocialChange}
-                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                placeholder="Facebook username"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <FaTwitter className="text-blue-400 mr-2" />
-              <input 
-                type="text" 
-                name="twitter"
-                value={profileData.socialMedia.twitter} 
-                onChange={handleSocialChange}
-                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                placeholder="Twitter username"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <FaLinkedin className="text-blue-700 mr-2" />
-              <input 
-                type="text" 
-                name="linkedin"
-                value={profileData.socialMedia.linkedin} 
-                onChange={handleSocialChange}
-                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                placeholder="LinkedIn username"
-              />
-            </div>
-
-            <div className="flex items-center">
-              <FaInstagram className="text-pink-600 mr-2" />
-              <input 
-                type="text" 
-                name="instagram"
-                value={profileData.socialMedia.instagram} 
-                onChange={handleSocialChange}
-                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-                placeholder="Instagram username"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end space-x-3 mt-6">
-        <button 
-          onClick={handleResetProfile}
-          className="bg-red-500 text-white px-4 py-2 rounded-md shadow hover:bg-red-600 transition-colors"
-        >
-          Reset Info
-        </button>
-        <button 
-          onClick={handleSaveChanges}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition-colors"
-        >
-          Save Changes
-        </button>
-      </div>
+      {/* Render all field sections using the helper function */}
+      {renderFieldSection('name', 'Full Name')}
+      {renderFieldSection('email', 'Email address', 'email')}
+      {renderFieldSection('address', 'Address', 'textarea')}
+      {renderFieldSection('phone', 'Phone number', 'tel')}
+      {renderFieldSection('dob', 'Date of Birth', 'date')}
+      
+      {/* Render social media section */}
+      {renderSocialMediaSection()}
     </div>
   );
 };
@@ -239,7 +306,7 @@ const ChangePasswordSection = ({ passwordData, setPasswordData }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Password</h2>
       <div className="space-y-6">
         <div>
@@ -278,7 +345,7 @@ const ChangePasswordSection = ({ passwordData, setPasswordData }) => {
         <div>
           <button 
             onClick={handleUpdatePassword}
-            className="w-full bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
           >
             Update Password
           </button>
@@ -357,6 +424,7 @@ function ProfilePage() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const fileInputRef = useRef(null);
+  const navigate = useNavigate();
 
   // Use the custom hook instead of the previous effect
   useOutsideClick(dropdownRef, () => setDropdownOpen(false));
@@ -366,11 +434,22 @@ function ProfilePage() {
     setDropdownOpen(false);
   };
 
+  const handleSignOut = () => {
+    // Remove user from localStorage
+    localStorage.removeItem("user");
+    // Display success notification
+    toast.success("Signed out successfully!");
+    // Navigate to home page/login page
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
+  };
+
   const navItems = [
-    { id: 'profile', label: 'Profile Info', icon: <FaUser size={18} /> },
-    { id: 'password', label: 'Change Password', icon: <FaLock size={18} /> },
-    { id: 'courses', label: 'Course Details', icon: <FaBook size={18} /> },
-    { id: 'activity', label: 'Login Activity', icon: <FaHistory size={18} /> }
+    { id: 'profile', label: 'Profile', icon: <FaUser size={16} /> },
+    { id: 'password', label: 'Security', icon: <FaLock size={16} /> },
+    { id: 'courses', label: 'Courses', icon: <FaBook size={16} /> },
+    { id: 'activity', label: 'Metrics', icon: <FaHistory size={16} /> }
   ];
 
   const renderSectionContent = () => {
@@ -408,79 +487,79 @@ function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 -mt-1">
       <Toaster position="top-right" />
-      <div className="max-w-7xl mx-auto">
-        {/* Top Navbar */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-6">
-          <div className="flex items-center justify-between p-3">
-            <div className="flex items-center">
+      
+      <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+        {/* Banner Section */}
+        <div className="relative">
+          {/* Banner Image */}
+          <div className="w-full h-40 md:h-60 overflow-hidden rounded-t-xl">
+            <img 
+              src={bannerImage} 
+              alt="Profile Banner" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          {/* Profile Photo - removed edit button */}
+          <div className="absolute -bottom-12 sm:-bottom-16 left-4 sm:left-8">
+            <div className="relative">
               <img 
                 src={profileData.photoUrl} 
                 alt="Profile" 
-                className="w-10 h-10 rounded-full object-cover border-2 border-blue-500 mr-2" 
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
               />
-              <div>
-                <h3 className="text-base font-bold text-gray-900 dark:text-white">{profileData.name}</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">{profileData.email}</p>
-              </div>
             </div>
-            <div className="sm:hidden relative" ref={dropdownRef}>
-              <button 
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center justify-center p-2 text-gray-700 dark:text-white hover:text-gray-500 dark:hover:text-gray-300"
-              >
-                <FaBars size={18} />
-              </button>
-              {dropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="fixed right-4 top-24 w-52 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-                >
-                  <ul className="py-1">
-                    {navItems.map(item => (
-                      <li key={item.id}>
-                        <button
-                          className={`flex items-center w-full px-4 py-1.5 text-sm text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                            activeSection === item.id 
-                              ? 'text-blue-600 dark:text-blue-400 font-medium' 
-                              : 'text-gray-700 dark:text-white'
-                          }`}
-                          onClick={() => handleSectionChange(item.id)}
-                        >
-                          <span className="mr-3 text-blue-500">{item.icon}</span>
-                          <span>{item.label}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              )}
-            </div>
-            <nav className="hidden sm:flex flex-wrap justify-end space-x-2">
-              {navItems.map(item => (
-                <button
-                  key={item.id}
-                  className={`flex items-center px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                    activeSection === item.id 
-                      ? 'bg-blue-600 text-white' 
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
-                  }`}
-                  onClick={() => handleSectionChange(item.id)}
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  <span>{item.label}</span>
-                </button>
-              ))}
-            </nav>
+          </div>
+          
+          {/* Sign Out Button - Half Sticking Out */}
+          <div className="absolute -bottom-14 right-4 sm:right-8">
+            <button 
+              onClick={handleSignOut}
+              className="px-3 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-white text-xs sm:text-sm font-medium rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center border border-gray-200 dark:border-gray-700"
+            >
+              <FaSignOutAlt className="mr-1" /> Sign out
+            </button>
           </div>
         </div>
         
-        {/* Main Content */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-          <div className="p-6">
+        {/* Profile Info, Navigation and Content - All in one container */}
+        <div className="pt-20 sm:pt-24 px-4 sm:px-8">
+          {/* User Info - removed Active tag */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                {profileData.name}
+              </h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {profileData.email}
+              </p>
+            </div>
+          </div>
+          
+          {/* Navigation Tabs */}
+          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+            <div className="flex space-x-4 sm:space-x-8 pb-1">
+              {navItems.map(item => (
+                <button
+                  key={item.id}
+                  className={`pb-2 px-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                    activeSection === item.id 
+                      ? 'text-gray-900 dark:text-white font-semibold'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                  onClick={() => handleSectionChange(item.id)}
+                >
+                  <span className="mr-1.5 sm:mr-2">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {/* Content Section */}
+          <div className="py-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
