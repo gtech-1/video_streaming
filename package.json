@@ -34,6 +34,8 @@
     "react-oauth2-login": "^1.0.3",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1",
     "tailwind-merge": "^3.0.1"
   },
   "devDependencies": {
