@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Bell, ChevronDown, Globe, Search, User, Menu, X, Sun, Moon } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "../assets/logo.png";
+import dlogo from "../assets/dlogo.svg";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "../redux/themeSlice";
@@ -45,6 +46,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    setIsUserOpen(false); // Close dropdown when logging out
     navigate("/");
   };
 
@@ -54,8 +56,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const dropdownBg = darkMode ? "bg-gray-800" : "bg-gray-100";
   const dropdownText = darkMode ? "text-gray-100" : "text-gray-900";
 
-  // Updated search bar styles:
-  // In dark mode, use bg-gray-900 (darker than the nav background) and in light mode keep it as is.
+  // Updated search bar styles
   const searchBarBg = darkMode ? "bg-gray-900" : "bg-gray-100";
   const searchBarText = darkMode ? "text-white" : "text-gray-900";
   const searchPlaceholder = darkMode ? "placeholder-gray-400" : "placeholder-gray-500";
@@ -67,7 +68,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
         <button onClick={handleHamburgerClick} className="mr-3 flex items-center cursor-pointer">
           {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
-        <img src={logo} alt="Logo" className="h-10 mt-1 ml-1" />
+        <img src={darkMode ? logo : dlogo} alt="Logo" className="h-10 mt-1 ml-1" />
       </div>
 
       {/* Right Side Navbar Items */}
@@ -190,18 +191,36 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                   className={`absolute right-0 mt-2 min-w-[150px] ${dropdownBg} ${dropdownText} border rounded-lg shadow-lg`}
                 >
                   <ul className="p-2">
-                    <li className={`px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}>
-                      <Link to="/home/profile">Profile</Link>
+                    <li className="cursor-pointer">
+                      <Link
+                        to="/home/profile"
+                        onClick={() => setIsUserOpen(false)}
+                        className={`block px-4 py-2 w-full h-full ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                      >
+                        Profile
+                      </Link>
                     </li>
-                    <li className={`px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}>
-                      <Link to="/home/dashboard">Dashboard</Link>
+                    <li className="cursor-pointer">
+                      <Link
+                        to="/home/dashboard"
+                        onClick={() => setIsUserOpen(false)}
+                        className={`block px-4 py-2 w-full h-full ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                      >
+                        Dashboard
+                      </Link>
                     </li>
-                    <li className={`px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}>
-                      <Link to="/home/settings">Settings</Link>
+                    <li className="cursor-pointer">
+                      <Link
+                        to="/home/settings"
+                        onClick={() => setIsUserOpen(false)}
+                        className={`block px-4 py-2 w-full h-full ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                      >
+                        Settings
+                      </Link>
                     </li>
                     <li
                       onClick={handleLogout}
-                      className={`px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
+                      className={`block px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
                     >
                       Logout
                     </li>
