@@ -113,15 +113,15 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
 
   // Render an editable field section
   const renderFieldSection = (field, title, inputType = 'text', inputProps = {}) => (
-    <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+    <div className="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">{title}</h3>
         {editingField !== field && (
           <button 
             onClick={() => handleEditClick(field)} 
             className="text-blue-600 dark:text-blue-400"
           >
-            <FaPencilAlt size={16} />
+            <FaPencilAlt size={14} className="sm:text-base" />
           </button>
         )}
       </div>
@@ -132,7 +132,7 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
             <textarea 
               value={editValues[field]}
               onChange={(e) => handleInputChange(e, field)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
               rows="3"
               {...inputProps}
             />
@@ -141,27 +141,27 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
               type={inputType}
               value={editValues[field]}
               onChange={(e) => handleInputChange(e, field)}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
               {...inputProps}
             />
           )}
           <div className="flex space-x-2 mt-2">
             <button 
               onClick={() => handleSaveField(field)}
-              className="flex items-center justify-center px-3 py-1 bg-green-500 text-white rounded-md text-sm"
+              className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-green-500 text-white rounded-md text-xs sm:text-sm"
             >
-              <FaCheck className="mr-1" size={12} /> Save
+              <FaCheck className="mr-1" size={10} /> Save
             </button>
             <button 
               onClick={handleCancelEdit}
-              className="flex items-center justify-center px-3 py-1 bg-red-500 text-white rounded-md text-sm"
+              className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-red-500 text-white rounded-md text-xs sm:text-sm"
             >
-              <FaTimes className="mr-1" size={12} /> Cancel
+              <FaTimes className="mr-1" size={10} /> Cancel
             </button>
           </div>
         </div>
       ) : (
-        <p className="text-gray-700 dark:text-gray-300 mt-1">
+        <p className="text-gray-700 dark:text-gray-300 mt-1 text-sm sm:text-base">
           {field === 'phone' ? (profileData[field] || "+1 (234) 567-8901") : profileData[field]}
         </p>
       )}
@@ -170,32 +170,32 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
 
   // Render social media section
   const renderSocialMediaSection = () => (
-    <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">Social Media</h3>
+    <div className="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
+      <div className="flex justify-between items-center mb-2 sm:mb-3">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Social Media</h3>
         {editingField !== 'socialMedia' && (
           <button 
             onClick={() => handleEditClick('socialMedia')} 
             className="text-blue-600 dark:text-blue-400"
           >
-            <FaPencilAlt size={16} />
+            <FaPencilAlt size={14} className="sm:text-base" />
           </button>
         )}
       </div>
       
       {editingField === 'socialMedia' ? (
-        <div className="mt-2 space-y-3">
+        <div className="mt-2 space-y-2 sm:space-y-3">
           {['facebook', 'twitter', 'linkedin', 'instagram'].map(platform => (
             <div key={platform} className="flex items-center">
-              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-xl mr-3" />}
-              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-xl mr-3" />}
-              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-xl mr-3" />}
-              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-xl mr-3" />}
+              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-lg sm:text-xl mr-2 sm:mr-3" />}
               <input 
                 type="text" 
                 value={editValues.socialMedia[platform]}
                 onChange={(e) => handleInputChange(e, 'socialMedia', platform)}
-                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className="flex-1 p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white text-sm sm:text-base"
                 placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
               />
             </div>
@@ -204,29 +204,29 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
           <div className="flex space-x-2 mt-2">
             <button 
               onClick={() => handleSaveField('socialMedia')}
-              className="flex items-center justify-center px-3 py-1 bg-green-500 text-white rounded-md text-sm"
+              className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-green-500 text-white rounded-md text-xs sm:text-sm"
             >
-              <FaCheck className="mr-1" size={12} /> Save
+              <FaCheck className="mr-1" size={10} /> Save
             </button>
             <button 
               onClick={handleCancelEdit}
-              className="flex items-center justify-center px-3 py-1 bg-red-500 text-white rounded-md text-sm"
+              className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-red-500 text-white rounded-md text-xs sm:text-sm"
             >
-              <FaTimes className="mr-1" size={12} /> Cancel
+              <FaTimes className="mr-1" size={10} /> Cancel
             </button>
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {['facebook', 'twitter', 'linkedin', 'instagram'].map(platform => (
             <div key={platform} className="flex items-center">
-              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-xl mr-3" />}
-              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-xl mr-3" />}
-              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-xl mr-3" />}
-              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-xl mr-3" />}
+              {platform === 'facebook' && <FaFacebook className="text-blue-600 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'twitter' && <FaTwitter className="text-blue-400 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'linkedin' && <FaLinkedin className="text-blue-700 text-lg sm:text-xl mr-2 sm:mr-3" />}
+              {platform === 'instagram' && <FaInstagram className="text-pink-600 text-lg sm:text-xl mr-2 sm:mr-3" />}
               <a 
                 href={profileData.socialMedia[platform]} 
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm sm:text-base"
               >
                 {profileData.socialMedia[platform] || 'Not connected'}
               </a>
@@ -238,25 +238,25 @@ const ProfileInfoSection = ({ profileData, setProfileData, initialUserData, file
   );
 
   return (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Profile Information</h2>
+    <div className="space-y-6 sm:space-y-8">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Profile Information</h2>
       
       {/* Profile Photo Section */}
-      <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Profile photo</h3>
+      <div className="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">Profile photo</h3>
         </div>
         <div className="flex items-center">
-          <div className="mr-4">
+          <div className="mr-3 sm:mr-4">
             <img 
               src={profileData.photoUrl} 
               alt="Profile" 
-              className="w-16 h-16 rounded-full object-cover"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
             />
           </div>
           <button
             onClick={() => fileInputRef.current.click()}
-            className="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white text-sm rounded-md transition-colors"
+            className="px-2 py-1 sm:px-3 sm:py-1.5 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white text-xs sm:text-sm rounded-md transition-colors"
           >
             Update
           </button>
@@ -306,46 +306,46 @@ const ChangePasswordSection = ({ passwordData, setPasswordData }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Change Password</h2>
-      <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Change Password</h2>
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
           <input 
             type="password" 
             name="currentPassword"
             value={passwordData.currentPassword}
             onChange={handlePasswordChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white text-sm sm:text-base"
             placeholder="Enter your current password"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
           <input 
             type="password" 
             name="newPassword"
             value={passwordData.newPassword}
             onChange={handlePasswordChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white text-sm sm:text-base"
             placeholder="Enter new password"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New Password</label>
           <input 
             type="password" 
             name="confirmNewPassword"
             value={passwordData.confirmNewPassword}
             onChange={handlePasswordChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white text-sm sm:text-base"
             placeholder="Confirm new password"
           />
         </div>
         <div>
           <button 
             onClick={handleUpdatePassword}
-            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm sm:text-base"
           >
             Update Password
           </button>
@@ -358,28 +358,28 @@ const ChangePasswordSection = ({ passwordData, setPasswordData }) => {
 // ============== CourseDetailsSection Component ==============
 const CourseDetailsSection = ({ profileData }) => (
   <div>
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Course Details</h2>
-    <div className="space-y-6">
+    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Course Details</h2>
+    <div className="space-y-4 sm:space-y-6">
       {profileData.courses.map(course => (
-        <div key={course.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{course.name}</h3>
+        <div key={course.id} className="bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-lg shadow">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">{course.name}</h3>
           <div className="mt-2">
             <div className="flex items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400 mr-2">Progress:</span>
-              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mr-2">Progress:</span>
+              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 sm:h-2.5">
                 <div 
-                  className="bg-blue-600 h-2.5 rounded-full" 
+                  className="bg-blue-600 h-2 sm:h-2.5 rounded-full" 
                   style={{ width: `${course.progress}%` }}
                 ></div>
               </div>
-              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{course.progress}%</span>
+              <span className="ml-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">{course.progress}%</span>
             </div>
           </div>
-          <div className="mt-4 flex space-x-2">
-            <button className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+          <div className="mt-3 sm:mt-4 flex space-x-2">
+            <button className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
               View Details
             </button>
-            <button className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+            <button className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
               Continue Course
             </button>
           </div>
@@ -392,21 +392,21 @@ const CourseDetailsSection = ({ profileData }) => (
 // ============== LoginActivitySection Component ==============
 const LoginActivitySection = ({ profileData }) => (
   <div>
-    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Login Activity</h2>
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Login Activity</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">First Login</h3>
-          <p className="text-gray-600 dark:text-gray-400">{profileData.loginActivity.firstLogin}</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">First Login</h3>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{profileData.loginActivity.firstLogin}</p>
         </div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Last Login</h3>
-          <p className="text-gray-600 dark:text-gray-400">{profileData.loginActivity.lastLogin}</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">Last Login</h3>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{profileData.loginActivity.lastLogin}</p>
         </div>
       </div>
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Recent Activity</h3>
-        <p className="text-gray-600 dark:text-gray-400">No unusual activity detected.</p>
+      <div className="mt-4 sm:mt-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">Recent Activity</h3>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">No unusual activity detected.</p>
       </div>
     </div>
   </div>
@@ -487,14 +487,14 @@ function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 -mt-1">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-2 sm:p-4 -mt-1">
       <Toaster position="top-right" />
       
       <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
         {/* Banner Section */}
         <div className="relative">
           {/* Banner Image */}
-          <div className="w-full h-40 md:h-60 overflow-hidden rounded-t-xl">
+          <div className="w-full h-32 sm:h-40 md:h-60 overflow-hidden rounded-t-xl">
             <img 
               src={bannerImage} 
               alt="Profile Banner" 
@@ -503,21 +503,21 @@ function ProfilePage() {
           </div>
           
           {/* Profile Photo - removed edit button */}
-          <div className="absolute -bottom-12 sm:-bottom-16 left-4 sm:left-8">
+          <div className="absolute -bottom-10 sm:-bottom-12 md:-bottom-16 left-2 sm:left-4 md:left-8">
             <div className="relative">
               <img 
                 src={profileData.photoUrl} 
                 alt="Profile" 
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
+                className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
               />
             </div>
           </div>
           
           {/* Sign Out Button - Half Sticking Out */}
-          <div className="absolute -bottom-14 right-4 sm:right-8">
+          <div className="absolute -bottom-12 sm:-bottom-14 right-2 sm:right-4 md:right-8">
             <button 
               onClick={handleSignOut}
-              className="px-3 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-white text-xs sm:text-sm font-medium rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center border border-gray-200 dark:border-gray-700"
+              className="px-2 py-1 sm:px-3 sm:py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-white text-xs sm:text-sm font-medium rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center border border-gray-200 dark:border-gray-700"
             >
               <FaSignOutAlt className="mr-1" /> Sign out
             </button>
@@ -525,14 +525,14 @@ function ProfilePage() {
         </div>
         
         {/* Profile Info, Navigation and Content - All in one container */}
-        <div className="pt-20 sm:pt-24 px-4 sm:px-8">
+        <div className="pt-16 sm:pt-20 md:pt-24 px-4 sm:px-6 md:px-8">
           {/* User Info - removed Active tag */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:mb-6">
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 {profileData.name}
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {profileData.email}
               </p>
             </div>
@@ -540,7 +540,7 @@ function ProfilePage() {
           
           {/* Navigation Tabs */}
           <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            <div className="flex space-x-4 sm:space-x-8 pb-1">
+            <div className="flex space-x-2 sm:space-x-4 md:space-x-8 pb-1">
               {navItems.map(item => (
                 <button
                   key={item.id}
@@ -551,7 +551,7 @@ function ProfilePage() {
                   }`}
                   onClick={() => handleSectionChange(item.id)}
                 >
-                  <span className="mr-1.5 sm:mr-2">{item.icon}</span>
+                  <span className="mr-1 sm:mr-1.5 md:mr-2">{item.icon}</span>
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -559,7 +559,7 @@ function ProfilePage() {
           </div>
           
           {/* Content Section */}
-          <div className="py-6">
+          <div className="py-4 sm:py-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
