@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import ResearchGif from "../assets/rgif.gif";
 
 // Replace with your chosen free background video URL from Coverr or Pexels
 const bgVideoUrl = "https://coverr.co/s3/mp4/whiteboard-educator.mp4";
@@ -137,82 +138,77 @@ const Landing = () => {
         </div>
       </motion.div>
 
-      {/* Hero Section with Background Video - Fixed vertical centering for mobile */}
-      <section ref={heroRef} className="relative w-full min-h-screen flex items-center justify-center">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          poster="https://images.pexels.com/photos/414612/pexels-photo-414612.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        >
-          <source src={bgVideoUrl} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        
-        {/* Animated Decorative Elements */}
-        <motion.div
-          className="absolute -top-16 -left-16 w-32 sm:w-40 h-32 sm:h-40 bg-blue-400 rounded-full filter blur-3xl opacity-50"
-          animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute -bottom-16 -right-16 w-32 sm:w-40 h-32 sm:h-40 bg-blue-400 rounded-full filter blur-3xl opacity-50"
-          animate={{ x: [0, -20, 0], y: [0, 20, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        {/* Hero Content - Proper vertical and horizontal centering for all devices */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20 my-auto" 
-        >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold drop-shadow-lg text-white">
-            Ignite Your Learning Journey
-          </h1>
-          <p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl max-w-3xl text-white">
-            Empower yourself with interactive courses, real-time academic tracking, and a global community.
-          </p>
-          <div className="mt-6 sm:mt-8">
-            <button
-              onClick={() => navigate("/signin")}
-              className="px-6 py-2 sm:px-8 sm:py-3 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition text-sm sm:text-base"
-            >
-              Get Started
-            </button>
-          </div>
-        </motion.div>
-      </section>
 
-      {/* Dashboard Features Section */}
-      <section ref={dashboardRef} className="py-12 sm:py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">Your Personalized Dashboard</h2>
-            <p className="text-base sm:text-lg max-w-3xl mx-auto mb-6 sm:mb-8 px-2 text-gray-700">
-              Monitor your grades, assignments, and progress—all in one intuitive interface.
-            </p>
-            <motion.img
-              src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1600"
-              alt="Dashboard Preview"
-              className="w-full sm:w-11/12 md:w-3/4 lg:w-2/3 rounded-lg shadow-lg mx-auto"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 1 }}
-            />
-          </motion.div>
-        </div>
-      </section>
+      <section
+        ref={heroRef}
+        className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
+        style={{ backgroundColor: "rgb(255, 255, 255)" }}
+      >
+  {/* Optional Background Video */}
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="absolute top-0 left-0 w-full h-full object-cover opacity-30 z-0"
+    src={bgVideoUrl}
+  />
+
+  {/* Overlay for contrast */}
+  <div className="absolute inset-0 bg-white/50 z-0" />
+
+  {/* Content */}
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1.5, ease: "easeOut" }}
+    className="relative z-10 w-full max-w-7xl px-6 py-12 md:py-24 flex flex-col-reverse md:flex-row items-center justify-between"
+  >
+    {/* Left: Text */}
+    <div className="w-full md:w-1/2 text-center md:text-left">
+      <h1
+        className="text-4xl sm:text-5xl lg:text-6xl font-extrabold drop-shadow-lg leading-tight"
+        style={{ color: "#1f2937" }} // dark gray
+      >
+        Ignite Your <br className="hidden sm:block" /> Learning Journey
+      </h1>
+      <p
+        className="mt-6 text-lg sm:text-xl md:text-2xl max-w-xl mx-auto md:mx-0"
+        style={{ color: "#1f2937" }}
+      >
+        Empower yourself with interactive courses, real-time academic tracking, and a global community.
+      </p>
+      <div className="mt-8">
+        {/* <button
+          onClick={() => navigate("/signin")}
+          className="px-8 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition text-base sm:text-lg shadow-lg"
+        >
+          Get Started
+        </button> */}
+        <button
+         onClick={() => navigate("/signin")}
+          className="px-8 py-3 bg-[#111827] text-white rounded-full hover:bg-gray-800 transition text-base sm:text-lg shadow-lg"
+           >
+          Get Started
+         </button>
+
+      </div>
+    </div>
+
+    {/* Right: GIF */}
+    <div className="w-full md:w-1/2 flex justify-center mb-10 md:mb-0">
+      <img
+        src={ResearchGif}
+        alt="Research animation"
+        loading="lazy"
+        className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg rounded-xl shadow-xl"
+      />
+      </div>
+       </motion.div>
+     </section>
+
+
+       
 
       {/* Courses Offered Section - IMPROVED */}
       <section ref={coursesRef} className="py-12 sm:py-16 md:py-20 bg-gray-100">
@@ -350,11 +346,12 @@ const Landing = () => {
               Join thousands of learners in an LMS designed to empower, engage, and elevate your academic and professional journey.
             </p>
             <button
-              onClick={() => navigate("/signin")}
-              className="mt-2 sm:mt-4 px-6 py-2 sm:px-8 sm:py-4 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition text-sm sm:text-base"
-            >
-              Get Started
-            </button>
+  onClick={() => navigate("/signin")}
+  className="mt-2 sm:mt-4 px-6 py-2 sm:px-8 sm:py-4 bg-[#111827] text-white rounded-full hover:bg-gray-800 transition text-sm sm:text-base"
+>
+  Get Started
+</button>
+
           </motion.div>
         </div>
       </section>
@@ -366,4 +363,6 @@ const Landing = () => {
   );
 };
 
-export default Landing;
+ export default Landing;
+
+
