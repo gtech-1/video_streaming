@@ -9,6 +9,7 @@ import { LuUsers } from "react-icons/lu";
 import { FaBuildingUser } from "react-icons/fa6";
 import { FaIdBadge } from "react-icons/fa";
 import { MdNoAccounts, MdManageAccounts } from "react-icons/md";
+import { useSelector } from "react-redux";
 
 // Custom hook to detect desktop (≥1280px)
 const useIsDesktop = () => {
@@ -27,6 +28,11 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const [rolesMgmtOpen, setRolesMgmtOpen] = useState(false);
   const [editUserOpen, setEditUserOpen] = useState(false);
   const sidebarRef = useRef(null);
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
+  // Determine sidebar container classes based on theme
+  const sidebarBg = darkMode ? "bg-gray-800" : "bg-gray-200";
+  const textColor = darkMode ? "text-white" : "text-gray-900";
 
   // Compute variants based on whether we're on desktop or mobile.
   const variants = isDesktop
@@ -84,9 +90,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           animate="closed"
           exit="closed"
           variants={variants}
-          className="fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50 flex flex-col"
+          className={`fixed top-[56px] left-0 bottom-0 ${sidebarBg} ${textColor} pb-3 z-50 flex flex-col`}
         >
           <SidebarContent
+            darkMode={darkMode}
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
             userMgmtOpen={userMgmtOpen}
@@ -107,9 +114,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
       initial={false}
       animate={isSidebarOpen ? "open" : "closed"}
       variants={variants}
-      className="fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50 flex flex-col"
+      className={`fixed top-[56px] left-0 bottom-0 ${sidebarBg} ${textColor} pb-3 z-50 flex flex-col`}
     >
       <SidebarContent
+        darkMode={darkMode}
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
         userMgmtOpen={userMgmtOpen}
@@ -129,9 +137,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
           animate="open"
           exit="closed"
           variants={variants}
-          className="fixed top-[56px] left-0 bottom-0 bg-gray-900 text-white pb-3 z-50 flex flex-col"
+          className={`fixed top-[56px] left-0 bottom-0 ${sidebarBg} ${textColor} pb-3 z-50 flex flex-col`}
         >
           <SidebarContent
+            darkMode={darkMode}
             isSidebarOpen={isSidebarOpen}
             toggleSidebar={toggleSidebar}
             userMgmtOpen={userMgmtOpen}
@@ -148,6 +157,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 };
 
 const SidebarContent = ({
+  darkMode,
   isSidebarOpen,
   toggleSidebar,
   userMgmtOpen,
@@ -161,6 +171,7 @@ const SidebarContent = ({
     <div className="overflow-y-auto flex-1 mt-2 px-2">
       <nav className="space-y-1">
         <NavItem
+          darkMode={darkMode}
           icon={<HiOutlineViewGrid size={18} />}
           text="Dashboard"
           isSidebarOpen={isSidebarOpen}
@@ -168,6 +179,7 @@ const SidebarContent = ({
           toggleSidebar={toggleSidebar}
         />
         <NavItem
+          darkMode={darkMode}
           icon={<IoMdListBox size={18} />}
           text="Menu Page"
           isSidebarOpen={isSidebarOpen}
@@ -175,6 +187,7 @@ const SidebarContent = ({
           toggleSidebar={toggleSidebar}
         />
         <NavItem
+          darkMode={darkMode}
           icon={<LuUsers size={18} />}
           text="User List"
           isSidebarOpen={isSidebarOpen}
@@ -182,6 +195,7 @@ const SidebarContent = ({
           toggleSidebar={toggleSidebar}
         />
         <DropdownItem
+          darkMode={darkMode}
           icon={<FaUsers size={16} />}
           text="User Mgmt"
           isSidebarOpen={isSidebarOpen}
@@ -189,11 +203,13 @@ const SidebarContent = ({
           toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}
         >
           <SubNavItem
+            darkMode={darkMode}
             text="View Users"
             toggleSidebar={toggleSidebar}
             path="/home/userview"
           />
           <DropdownItem
+            darkMode={darkMode}
             icon={<FaUserEdit size={14} />}
             text="Edit User"
             isSidebarOpen={isSidebarOpen}
@@ -201,22 +217,26 @@ const SidebarContent = ({
             toggleOpen={() => setEditUserOpen(!editUserOpen)}
           >
             <SubNavItem
+              darkMode={darkMode}
               text="Edit Name"
               toggleSidebar={toggleSidebar}
               path="/home/editname"
             />
             <SubNavItem
+              darkMode={darkMode}
               text="Edit Email"
               toggleSidebar={toggleSidebar}
               path="/home/editemail"
             />
             <SubNavItem
+              darkMode={darkMode}
               text="Edit Role"
               toggleSidebar={toggleSidebar}
               path="/home/editrole"
             />
           </DropdownItem>
           <SubNavItem
+            darkMode={darkMode}
             icon={<FaUserMinus size={14} />}
             text="Delete User"
             toggleSidebar={toggleSidebar}
@@ -224,6 +244,7 @@ const SidebarContent = ({
           />
         </DropdownItem>
         <DropdownItem
+          darkMode={darkMode}
           icon={<FaBuildingUser size={16} />}
           text="Roles Mgmt"
           isSidebarOpen={isSidebarOpen}
@@ -231,18 +252,21 @@ const SidebarContent = ({
           toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}
         >
           <SubNavItem
+            darkMode={darkMode}
             icon={<MdManageAccounts size={15} />}
             text="Update Roles"
             toggleSidebar={toggleSidebar}
             path="/home/updateroles"
           />
           <SubNavItem
+            darkMode={darkMode}
             icon={<MdNoAccounts size={15} />}
             text="Remove Roles"
             toggleSidebar={toggleSidebar}
             path="/home/removeroles"
           />
           <SubNavItem
+            darkMode={darkMode}
             icon={<FaIdBadge size={15} />}
             text="Assign Roles"
             toggleSidebar={toggleSidebar}
@@ -254,8 +278,7 @@ const SidebarContent = ({
   );
 };
 
-// Updated NavItem using NavLink with a slightly lighter active highlight
-const NavItem = ({ icon, text, isSidebarOpen, path, toggleSidebar }) => {
+const NavItem = ({ darkMode, icon, text, isSidebarOpen, path, toggleSidebar }) => {
   const handleClick = () => {
     if (window.innerWidth < 640 && toggleSidebar) {
       toggleSidebar();
@@ -271,8 +294,12 @@ const NavItem = ({ icon, text, isSidebarOpen, path, toggleSidebar }) => {
           isSidebarOpen ? "justify-start" : "justify-center"
         } ${
           isActive
-            ? "bg-gray-800 border-l-4 border-gray-600"
-            : "hover:bg-gray-700"
+            ? darkMode
+              ? "bg-gray-700 border-l-4 border-gray-500"
+              : "bg-gray-100 border-l-4 border-gray-400"
+            : darkMode
+            ? "hover:bg-gray-700"
+            : "hover:bg-gray-300"
         }`
       }
     >
@@ -282,8 +309,7 @@ const NavItem = ({ icon, text, isSidebarOpen, path, toggleSidebar }) => {
   );
 };
 
-// Updated SubNavItem using NavLink with a slightly lighter active highlight
-const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
+const SubNavItem = ({ darkMode, icon, text, toggleSidebar, path }) => {
   const handleClick = () => {
     if (window.innerWidth < 640 && toggleSidebar) {
       toggleSidebar();
@@ -297,8 +323,12 @@ const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
       className={({ isActive }) =>
         `flex items-center p-[5px] rounded transition-all ${
           isActive
-            ? "bg-gray-800 border-l-4 border-gray-600"
-            : "hover:bg-gray-700"
+            ? darkMode
+              ? "bg-gray-700 border-l-4 border-gray-500"
+              : "bg-gray-100 border-l-4 border-gray-400"
+            : darkMode
+            ? "hover:bg-gray-700"
+            : "hover:bg-gray-300"
         }`
       }
     >
@@ -311,6 +341,7 @@ const SubNavItem = ({ icon, text, toggleSidebar, path }) => {
 };
 
 const DropdownItem = ({
+  darkMode,
   icon,
   text,
   isSidebarOpen,
@@ -321,9 +352,9 @@ const DropdownItem = ({
   <div className="mb-[1px]">
     <button
       onClick={toggleOpen}
-      className={`flex items-center w-full p-[6px] rounded hover:bg-gray-700 transition-all ${
+      className={`flex items-center w-full p-[6px] rounded transition-all ${
         isSidebarOpen ? "justify-start" : "justify-center"
-      }`}
+      } ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"}`}
     >
       <div className="flex items-center">
         <div className="w-6 h-6 flex items-center justify-center">{icon}</div>
