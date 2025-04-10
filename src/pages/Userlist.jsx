@@ -3,6 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import UserDetails from "../components/UserDetails.json";
 import { FaEdit, FaTrash, FaPlus, FaDownload, FaUpload } from "react-icons/fa";
 import { FiFilter, FiChevronLeft, FiChevronRight, FiMoreVertical } from "react-icons/fi";
+import { useSelector } from "react-redux";
 
 const initializeUsers = (users) =>
   users.map((user, index) => ({
@@ -10,7 +11,22 @@ const initializeUsers = (users) =>
     ...user,
   }));
 
-const UserList = ({ isSidebarOpen }) => {
+const UserList = () => {
+  // Access the sidebar state from Redux
+  const isSidebarOpen = useSelector((state) => state.sidebar?.isOpen ?? true);
+  // Check if we're in desktop view
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
+  
+  // Update isDesktop state on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1280);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // State initialization
   const [members, setMembers] = useState(() => initializeUsers(UserDetails.members));
   const [admins, setAdmins] = useState(() => initializeUsers(UserDetails.admins));
@@ -137,11 +153,11 @@ const UserList = ({ isSidebarOpen }) => {
 
   return (
     // Outer wrapper: full viewport with dark mode background
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 overflow-x-hidden">
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-6 overflow-x-hidden ${isDesktop && !isSidebarOpen ? 'pl-[67px]' : ''}`}>
       <Toaster position="top-right" />
 
-      {/* Main container: centered and constrained */}
-      <div className="max-w-7xl mx-auto w-full transition-all duration-300">
+      {/* Main container: full width */}
+      <div className="w-full mx-auto transition-all duration-300">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div className="flex flex-wrap gap-2">
