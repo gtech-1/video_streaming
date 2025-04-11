@@ -6,6 +6,8 @@ import dlogo from "../assets/dlogo.svg";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "../redux/themeSlice";
+import { signOut } from "firebase/auth";
+import { auth } from "../../utils/firebase";
 
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
@@ -44,10 +46,15 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     toggleSidebar();
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setIsUserOpen(false); // Close dropdown when logging out
-    navigate("/");
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); 
+      localStorage.clear(); 
+      navigate("/"); 
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   // Conditional classes based on dark mode
