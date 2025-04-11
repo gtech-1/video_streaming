@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
   FaUser,
   FaLock,
@@ -425,6 +426,21 @@ function ProfilePage() {
   const dropdownRef = useRef(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  
+  // Access the sidebar state from Redux
+  const isSidebarOpen = useSelector((state) => state.sidebar?.isOpen ?? true);
+  // Check if we're in desktop view
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
+  
+  // Update isDesktop state on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1280);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Use the custom hook instead of the previous effect
   useOutsideClick(dropdownRef, () => setDropdownOpen(false));
@@ -487,14 +503,14 @@ function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-2 sm:p-4 -mt-1">
+    <div className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-3 sm:px-3 sm:py-3 -mt-1 ${isDesktop && !isSidebarOpen ? 'pl-[67px]' : ''}`}>
       <Toaster position="top-right" />
       
-      <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+      <div className="w-full mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden p-2 sm:p-0">
         {/* Banner Section */}
         <div className="relative">
-          {/* Banner Image */}
-          <div className="w-full h-32 sm:h-40 md:h-60 overflow-hidden rounded-t-xl">
+          {/* Banner Image - more compact for ultra-small screens */}
+          <div className="w-full h-20 sm:h-32 md:h-60 overflow-hidden rounded-t-xl">
             <img 
               src={bannerImage} 
               alt="Profile Banner" 
@@ -502,56 +518,56 @@ function ProfilePage() {
             />
           </div>
           
-          {/* Profile Photo - removed edit button */}
-          <div className="absolute -bottom-10 sm:-bottom-12 md:-bottom-16 left-2 sm:left-4 md:left-8">
+          {/* Profile Photo - even smaller for ultra-small screens */}
+          <div className="absolute -bottom-7 sm:-bottom-10 md:-bottom-16 left-1 sm:left-4 md:left-8">
             <div className="relative">
               <img 
                 src={profileData.photoUrl} 
                 alt="Profile" 
-                className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full object-cover border-4 border-white dark:border-gray-800 shadow-lg"
+                className="w-14 h-14 sm:w-20 sm:h-20 md:w-32 md:h-32 rounded-full object-cover border-2 sm:border-4 border-white dark:border-gray-800 shadow-lg"
               />
             </div>
           </div>
           
-          {/* Sign Out Button - Half Sticking Out */}
-          <div className="absolute -bottom-12 sm:-bottom-14 right-2 sm:right-4 md:right-8">
+          {/* Sign Out Button - Larger for mobile */}
+          <div className="absolute -bottom-8 sm:-bottom-12 right-1 sm:right-4 md:right-8">
             <button 
               onClick={handleSignOut}
-              className="px-2 py-1 sm:px-3 sm:py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-white text-xs sm:text-sm font-medium rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center border border-gray-200 dark:border-gray-700"
+              className="px-2.5 py-1 sm:px-3 sm:py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-white text-xs sm:text-sm font-medium rounded-md shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center border border-gray-200 dark:border-gray-700"
             >
-              <FaSignOutAlt className="mr-1" /> Sign out
+              <FaSignOutAlt className="mr-1 sm:mr-1" size={13} /> <span className="text-xs sm:text-xs">Sign out</span>
             </button>
           </div>
         </div>
         
         {/* Profile Info, Navigation and Content - All in one container */}
-        <div className="pt-16 sm:pt-20 md:pt-24 px-4 sm:px-6 md:px-8">
+        <div className="pt-10 sm:pt-16 md:pt-24 px-3 sm:px-6 md:px-8 pb-3 sm:pb-0">
           {/* User Info - removed Active tag */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-1.5 sm:mb-6">
             <div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-base sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 {profileData.name}
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5 sm:mt-1">
                 {profileData.email}
               </p>
             </div>
           </div>
           
-          {/* Navigation Tabs */}
-          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
-            <div className="flex space-x-2 sm:space-x-4 md:space-x-8 pb-1">
+          {/* Navigation Tabs - optimized for ultra-small screens */}
+          <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto pt-2 sm:pt-0 pb-2 sm:pb-1 mt-2 sm:mt-0 mb-2 sm:mb-0">
+            <div className="flex justify-between sm:justify-start w-full sm:space-x-4 md:space-x-8">
               {navItems.map(item => (
                 <button
                   key={item.id}
-                  className={`pb-2 px-1 flex items-center text-xs sm:text-sm font-medium whitespace-nowrap transition-colors ${
+                  className={`py-2 sm:pb-2 px-1 sm:px-1 flex items-center justify-center text-[10px] sm:text-sm font-medium whitespace-nowrap transition-colors ${
                     activeSection === item.id 
                       ? 'text-gray-900 dark:text-white font-semibold'
                       : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                   onClick={() => handleSectionChange(item.id)}
                 >
-                  <span className="mr-1 sm:mr-1.5 md:mr-2">{item.icon}</span>
+                  <span className="mr-0.5 sm:mr-1.5 md:mr-2">{React.cloneElement(item.icon, { size: window.innerWidth < 350 ? 12 : window.innerWidth < 400 ? 15 : 16 })}</span>
                   <span>{item.label}</span>
                 </button>
               ))}
@@ -559,7 +575,7 @@ function ProfilePage() {
           </div>
           
           {/* Content Section */}
-          <div className="py-4 sm:py-6">
+          <div className="py-3 sm:py-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
