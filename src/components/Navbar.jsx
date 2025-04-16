@@ -46,12 +46,11 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     toggleSidebar();
   };
 
-
   const handleLogout = async () => {
     try {
-      await signOut(auth); 
-      localStorage.clear(); 
-      navigate("/"); 
+      await signOut(auth);
+      localStorage.clear();
+      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -127,11 +126,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
               onClick={() => dispatch(toggleDarkMode())} 
               className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
             >
-              {darkMode ? (
-                <Sun size={20} className="text-yellow-500" />
-              ) : (
-                <Moon size={20} className="text-gray-800" />
-              )}
+              {darkMode ? <Sun size={20} className="text-yellow-500" /> : <Moon size={20} className="text-gray-800" />}
             </button>
 
             {/* Notifications */}
@@ -216,15 +211,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                         Dashboard
                       </Link>
                     </li>
-                    <li className="cursor-pointer">
-                      <Link
-                        to="/home/settings"
-                        onClick={() => setIsUserOpen(false)}
-                        className={`block px-4 py-2 w-full h-full ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
-                      >
-                        Settings
-                      </Link>
-                    </li>
+                    {/* Settings removed */}
                     <li
                       onClick={handleLogout}
                       className={`block px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
