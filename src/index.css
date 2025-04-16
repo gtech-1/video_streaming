@@ -1,3 +1,68 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    margin: 0;
+    padding: 0;
+  }
+
+    .custom-calendar {
+        width: 100% !important;
+        max-width: 100% !important; /* Allow calendar to adjust */
+        min-width: 250px !important; /* Prevent excessive shrinking */
+        height: auto !important;
+        overflow: hidden;
+        background: white;
+        border-radius: 8px;
+        padding: 5px;
+        font-family: "Arial", sans-serif;
+        border: none;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Adjust tile sizes for different screen widths */
+    .react-calendar__tile {
+        padding: 4px !important; /* Slightly smaller padding */
+        font-size: clamp(10px, 2vw, 12px) !important; /* Auto-adjust font size */
+    }
+    
+    /* Adjust navigation bar */
+    .react-calendar__navigation {
+        font-size: clamp(12px, 2.5vw, 14px) !important; /* Responsive nav text */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    /* Make weekdays labels more readable */
+    .react-calendar__month-view__weekdays {
+        font-size: clamp(10px, 2vw, 11px) !important;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: #4b5563; /* Tailwind gray-600 */
+    }
+    
+    /* Ensure proper spacing for month navigation buttons */
+    .react-calendar__navigation button {
+        min-width: 35px;
+    }
+    
+    /* Responsive calendar border and spacing */
+    @media (max-width: 500px) {
+        .custom-calendar {
+            padding: 3px;
+            border-radius: 5px;
+        }
+    
+        .react-calendar__tile {
+            padding: 3px !important;
+            font-size: 10px !important;
+        }
+    
+        .react-calendar__navigation {
+            font-size: 12px !important;
+        }
+    }
+    
+    
