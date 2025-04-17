@@ -211,7 +211,6 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
                         Dashboard
                       </Link>
                     </li>
-                    {/* Settings removed */}
                     <li
                       onClick={handleLogout}
                       className={`block px-4 py-2 cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"}`}
