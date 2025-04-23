@@ -74,7 +74,7 @@ const Landing = () => {
       <motion.nav
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.5 } }}
-        className="sticky top-0 z-50 bg-gray-900 shadow-lg px-4 sm:px-6 md:px-8 lg:px-16 py-3 sm:py-4 flex justify-between items-center text-white"
+        className="fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-lg px-4 sm:px-6 md:px-8 lg:px-16 py-3 sm:py-4 flex justify-between items-center text-white"
       >
         <div className="text-xl sm:text-2xl font-bold">YourLMS</div>
         
@@ -83,9 +83,9 @@ const Landing = () => {
           <button onClick={() => scrollToSection(heroRef, true)} className="hover:text-blue-400 transition">
             Home
           </button>
-          <button onClick={() => scrollToSection(dashboardRef, true)} className="hover:text-blue-400 transition">
+          {/* <button onClick={() => scrollToSection(dashboardRef, true)} className="hover:text-blue-400 transition">
             Dashboard
-          </button>
+          </button> */}
           <button onClick={() => scrollToSection(coursesRef, true)} className="hover:text-blue-400 transition">
             Courses
           </button>
