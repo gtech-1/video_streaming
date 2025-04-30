@@ -10,6 +10,8 @@ import { FaBuildingUser } from "react-icons/fa6";
 import { FaIdBadge } from "react-icons/fa";
 import { MdNoAccounts, MdManageAccounts } from "react-icons/md";
 import { useSelector } from "react-redux";
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css';
 
 // Custom hook to detect desktop (≥1280px)
 const useIsDesktop = () => {
@@ -30,57 +32,31 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   const sidebarRef = useRef(null);
   const darkMode = useSelector((state) => state.theme.darkMode);
 
-  // Determine sidebar container classes based on theme
   const sidebarBg = darkMode ? "bg-gray-800" : "bg-gray-200";
   const textColor = darkMode ? "text-white" : "text-gray-900";
 
-  // Compute variants based on whether we're on desktop or mobile.
   const variants = isDesktop
     ? {
-        open: {
-          x: 0,
-          width: 250,
-          transition: { type: "spring", stiffness: 250, damping: 25 },
-        },
-        closed: {
-          x: 0,
-          width: 60,
-          transition: { type: "spring", stiffness: 250, damping: 25 },
-        },
+        open: { x: 0, width: 250, transition: { type: "spring", stiffness: 250, damping: 25 } },
+        closed: { x: 0, width: 60, transition: { type: "spring", stiffness: 250, damping: 25 } },
       }
     : {
-        open: {
-          x: 0,
-          width: 250,
-          transition: { type: "spring", stiffness: 250, damping: 30, bounce: 0 },
-        },
-        closed: {
-          x: -250,
-          width: 60,
-          transition: { type: "spring", stiffness: 250, damping: 30, bounce: 0 },
-        },
+        open: { x: 0, width: 250, transition: { type: "spring", stiffness: 250, damping: 30, bounce: 0 } },
+        closed: { x: -250, width: 60, transition: { type: "spring", stiffness: 250, damping: 30, bounce: 0 } },
       };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // On mobile (<640px), close sidebar if clicked outside
       if (window.innerWidth < 640) {
-        if (
-          sidebarRef.current &&
-          !sidebarRef.current.contains(event.target) &&
-          isSidebarOpen
-        ) {
+        if (sidebarRef.current && !sidebarRef.current.contains(event.target) && isSidebarOpen) {
           toggleSidebar();
         }
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSidebarOpen, toggleSidebar]);
 
-  // On mobile, if sidebar is closed, let AnimatePresence handle the exit.
-  // On desktop, always render the sidebar.
   if (!isDesktop && !isSidebarOpen) {
     return (
       <AnimatePresence mode="wait">
@@ -170,108 +146,22 @@ const SidebarContent = ({
   return (
     <div className="overflow-y-auto flex-1 mt-2 px-2">
       <nav className="space-y-1">
-        <NavItem
-          darkMode={darkMode}
-          icon={<HiOutlineViewGrid size={18} />}
-          text="Dashboard"
-          isSidebarOpen={isSidebarOpen}
-          path="/home/dashboard"
-          toggleSidebar={toggleSidebar}
-        />
-        <NavItem
-          darkMode={darkMode}
-          icon={<IoMdListBox size={18} />}
-          text="Menu Page"
-          isSidebarOpen={isSidebarOpen}
-          path="/home/menu"
-          toggleSidebar={toggleSidebar}
-        />
-        <NavItem
-          darkMode={darkMode}
-          icon={<LuUsers size={18} />}
-          text="User List"
-          isSidebarOpen={isSidebarOpen}
-          path="/home/userlist"
-          toggleSidebar={toggleSidebar}
-        />
-        <DropdownItem
-          darkMode={darkMode}
-          icon={<FaUsers size={16} />}
-          text="User Mgmt"
-          isSidebarOpen={isSidebarOpen}
-          isOpen={userMgmtOpen}
-          toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}
-        >
-          <SubNavItem
-            darkMode={darkMode}
-            text="View Users"
-            toggleSidebar={toggleSidebar}
-            path="/home/userview"
-          />
-          <DropdownItem
-            darkMode={darkMode}
-            icon={<FaUserEdit size={14} />}
-            text="Edit User"
-            isSidebarOpen={isSidebarOpen}
-            isOpen={editUserOpen}
-            toggleOpen={() => setEditUserOpen(!editUserOpen)}
-          >
-            <SubNavItem
-              darkMode={darkMode}
-              text="Edit Name"
-              toggleSidebar={toggleSidebar}
-              path="/home/editname"
-            />
-            <SubNavItem
-              darkMode={darkMode}
-              text="Edit Email"
-              toggleSidebar={toggleSidebar}
-              path="/home/editemail"
-            />
-            <SubNavItem
-              darkMode={darkMode}
-              text="Edit Role"
-              toggleSidebar={toggleSidebar}
-              path="/home/editrole"
-            />
+        <NavItem darkMode={darkMode} icon={<HiOutlineViewGrid size={18} />} text="Dashboard" isSidebarOpen={isSidebarOpen} path="/home/dashboard" toggleSidebar={toggleSidebar} />
+        <NavItem darkMode={darkMode} icon={<IoMdListBox size={18} />} text="Menu Page" isSidebarOpen={isSidebarOpen} path="/home/menu" toggleSidebar={toggleSidebar} />
+        <NavItem darkMode={darkMode} icon={<LuUsers size={18} />} text="User List" isSidebarOpen={isSidebarOpen} path="/home/userlist" toggleSidebar={toggleSidebar} />
+        <DropdownItem darkMode={darkMode} icon={<FaUsers size={16} />} text="User Mgmt" isSidebarOpen={isSidebarOpen} isOpen={userMgmtOpen} toggleOpen={() => setUserMgmtOpen(!userMgmtOpen)}>
+          <SubNavItem darkMode={darkMode} text="View Users" toggleSidebar={toggleSidebar} path="/home/userview" />
+          <DropdownItem darkMode={darkMode} icon={<FaUserEdit size={14} />} text="Edit User" isSidebarOpen={isSidebarOpen} isOpen={editUserOpen} toggleOpen={() => setEditUserOpen(!editUserOpen)}>
+            <SubNavItem darkMode={darkMode} text="Edit Name" toggleSidebar={toggleSidebar} path="/home/editname" />
+            <SubNavItem darkMode={darkMode} text="Edit Email" toggleSidebar={toggleSidebar} path="/home/editemail" />
+            <SubNavItem darkMode={darkMode} text="Edit Role" toggleSidebar={toggleSidebar} path="/home/editrole" />
           </DropdownItem>
-          <SubNavItem
-            darkMode={darkMode}
-            icon={<FaUserMinus size={14} />}
-            text="Delete User"
-            toggleSidebar={toggleSidebar}
-            path="/home/deleteuser"
-          />
+          <SubNavItem darkMode={darkMode} icon={<FaUserMinus size={14} />} text="Delete User" toggleSidebar={toggleSidebar} path="/home/deleteuser" />
         </DropdownItem>
-        <DropdownItem
-          darkMode={darkMode}
-          icon={<FaBuildingUser size={16} />}
-          text="Roles Mgmt"
-          isSidebarOpen={isSidebarOpen}
-          isOpen={rolesMgmtOpen}
-          toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}
-        >
-          <SubNavItem
-            darkMode={darkMode}
-            icon={<MdManageAccounts size={15} />}
-            text="Update Roles"
-            toggleSidebar={toggleSidebar}
-            path="/home/updateroles"
-          />
-          <SubNavItem
-            darkMode={darkMode}
-            icon={<MdNoAccounts size={15} />}
-            text="Remove Roles"
-            toggleSidebar={toggleSidebar}
-            path="/home/removeroles"
-          />
-          <SubNavItem
-            darkMode={darkMode}
-            icon={<FaIdBadge size={15} />}
-            text="Assign Roles"
-            toggleSidebar={toggleSidebar}
-            path="/home/assignroles"
-          />
+        <DropdownItem darkMode={darkMode} icon={<FaBuildingUser size={16} />} text="Roles Mgmt" isSidebarOpen={isSidebarOpen} isOpen={rolesMgmtOpen} toggleOpen={() => setRolesMgmtOpen(!rolesMgmtOpen)}>
+          <SubNavItem darkMode={darkMode} icon={<MdManageAccounts size={15} />} text="Update Roles" toggleSidebar={toggleSidebar} path="/home/updateroles" />
+          <SubNavItem darkMode={darkMode} icon={<MdNoAccounts size={15} />} text="Remove Roles" toggleSidebar={toggleSidebar} path="/home/removeroles" />
+          <SubNavItem darkMode={darkMode} icon={<FaIdBadge size={15} />} text="Assign Roles" toggleSidebar={toggleSidebar} path="/home/assignroles" />
         </DropdownItem>
       </nav>
     </div>
@@ -285,7 +175,7 @@ const NavItem = ({ darkMode, icon, text, isSidebarOpen, path, toggleSidebar }) =
     }
   };
 
-  return (
+  const link = (
     <NavLink
       to={path}
       onClick={handleClick}
@@ -307,6 +197,8 @@ const NavItem = ({ darkMode, icon, text, isSidebarOpen, path, toggleSidebar }) =
       {isSidebarOpen && <span className="ml-3 text-[15px]">{text}</span>}
     </NavLink>
   );
+
+  return !isSidebarOpen ? <Tippy content={text} placement="right">{link}</Tippy> : link;
 };
 
 const SubNavItem = ({ darkMode, icon, text, toggleSidebar, path }) => {
@@ -332,23 +224,13 @@ const SubNavItem = ({ darkMode, icon, text, toggleSidebar, path }) => {
         }`
       }
     >
-      {icon && (
-        <div className="w-5 h-5 flex items-center justify-center">{icon}</div>
-      )}
+      {icon && <div className="w-5 h-5 flex items-center justify-center">{icon}</div>}
       <span className="text-[14px] ml-2">{text}</span>
     </NavLink>
   );
 };
 
-const DropdownItem = ({
-  darkMode,
-  icon,
-  text,
-  isSidebarOpen,
-  isOpen,
-  toggleOpen,
-  children,
-}) => (
+const DropdownItem = ({ darkMode, icon, text, isSidebarOpen, isOpen, toggleOpen, children }) => (
   <div className="mb-[1px]">
     <button
       onClick={toggleOpen}
