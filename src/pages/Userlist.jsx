@@ -62,7 +62,7 @@ const UserList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Mobile “more” dropdown
+  // Mobile "more" dropdown
   const [showMoreOptions, setShowMoreOptions] = useState(false);
 
   // Refs for outside clicks
@@ -590,11 +590,13 @@ const UserList = () => {
 
         {/* Add User Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">
-                Add User
-              </h2>
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-20 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm transform transition-all">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Add New User
+                </h2>
+              </div>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -611,76 +613,95 @@ const UserList = () => {
                   };
                   handleAddUser(newUser);
                 }}
+                className="p-4 space-y-3"
               >
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Name
-                </label>
-                <input
-                  name="name"
-                  type="text"
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Email
-                </label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Mobile
-                </label>
-                <input
-                  name="mobile"
-                  type="text"
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Photo URL
-                </label>
-                <input
-                  name="photo"
-                  type="text"
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  User Type
-                </label>
-                <select
-                  name="userType"
-                  defaultValue={userType}
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="members">Member</option>
-                  <option value="admins">Admin</option>
-                </select>
-                <div className="flex justify-end gap-2">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Name
+                  </label>
+                  <input
+                    name="name"
+                    type="text"
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Enter name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Enter email"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Mobile
+                  </label>
+                  <input
+                    name="mobile"
+                    type="text"
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Enter mobile number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Photo URL
+                  </label>
+                  <input
+                    name="photo"
+                    type="text"
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Enter photo URL"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      User Type
+                    </label>
+                    <select
+                      name="userType"
+                      defaultValue={userType}
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    >
+                      <option value="members">Member</option>
+                      <option value="admins">Admin</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 bg-gray-200 rounded"
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Add
+                    Add User
                   </button>
                 </div>
               </form>
@@ -690,92 +711,102 @@ const UserList = () => {
 
         {/* Edit User Modal */}
         {showEditModal && selectedUser && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">
-                Edit User
-              </h2>
-              <form onSubmit={handleEditSubmit}>
-                {/* Name */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Name
-                </label>
-                <input
-                  name="name"
-                  defaultValue={selectedUser.name}
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {/* Email */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Email
-                </label>
-                <input
-                  name="email"
-                  type="email"
-                  defaultValue={selectedUser.email}
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {/* Mobile */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Mobile
-                </label>
-                <input
-                  name="mobile"
-                  defaultValue={selectedUser.mobile}
-                  required
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {/* Photo */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Photo URL
-                </label>
-                <input
-                  name="photo"
-                  defaultValue={selectedUser.photo}
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-                {/* Status */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  defaultValue={selectedUser.status}
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-                {/* User Type */}
-                <label className="block text-sm mb-1 text-gray-900 dark:text-white">
-                  User Type
-                </label>
-                <select
-                  name="userType"
-                  defaultValue={selectedUser.userType}
-                  className="w-full border px-3 py-2 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="members">Member</option>
-                  <option value="admins">Admin</option>
-                </select>
-                <div className="flex justify-end gap-2">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-20 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm transform transition-all">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Edit User
+                </h2>
+              </div>
+              <form onSubmit={handleEditSubmit} className="p-4 space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Name
+                  </label>
+                  <input
+                    name="name"
+                    defaultValue={selectedUser.name}
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    defaultValue={selectedUser.email}
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Mobile
+                  </label>
+                  <input
+                    name="mobile"
+                    defaultValue={selectedUser.mobile}
+                    required
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Photo URL
+                  </label>
+                  <input
+                    name="photo"
+                    defaultValue={selectedUser.photo}
+                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      defaultValue={selectedUser.status}
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      User Type
+                    </label>
+                    <select
+                      name="userType"
+                      defaultValue={selectedUser.userType}
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    >
+                      <option value="members">Member</option>
+                      <option value="admins">Admin</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
                     onClick={() => {
                       setShowEditModal(false);
                       setSelectedUser(null);
                     }}
-                    className="px-4 py-2 bg-gray-200 rounded"
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded"
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Save
+                    Save Changes
                   </button>
                 </div>
               </form>
@@ -785,31 +816,46 @@ const UserList = () => {
 
         {/* Delete Confirmation Modal */}
         {showDeleteModal && selectedUser && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-96">
-              <h2 className="text-xl mb-4 text-gray-900 dark:text-white">
-                Confirm Delete
-              </h2>
-              <p className="text-gray-900 dark:text-white">
-                Are you sure you want to delete{" "}
-                <strong>{selectedUser.name}</strong>?
-              </p>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setSelectedUser(null);
-                  }}
-                  className="px-4 py-2 bg-gray-200 rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeleteConfirm}
-                  className="px-4 py-2 bg-red-600 text-white rounded"
-                >
-                  Delete
-                </button>
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-20 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm transform transition-all">
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Delete User
+                </h2>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center space-x-3 mb-3">
+                  <img
+                    src={selectedUser.photo}
+                    alt={selectedUser.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Are you sure you want to delete this user?
+                    </p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      {selectedUser.name}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={() => {
+                      setShowDeleteModal(false);
+                      setSelectedUser(null);
+                    }}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteConfirm}
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    Delete User
+                  </button>
+                </div>
               </div>
             </div>
           </div>
