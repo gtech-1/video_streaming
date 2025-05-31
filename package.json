@@ -17,6 +17,7 @@
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.6.1",
     "@tippyjs/react": "^4.2.6",
+    "axios": "^1.9.0",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
     "clsx": "^2.1.1",
