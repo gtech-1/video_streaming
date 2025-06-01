@@ -12,7 +12,7 @@ import {
 } from "firebase/auth";
 import { GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from "../../../utils/firebase";
-import axios from "axios";
+import { authAPI } from "../../services/api";
 
 const images = [
   { id: 1, src: image1 },
@@ -90,25 +90,19 @@ const SignIn = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/register`,
-        formData
-      );
+      const response = await authAPI.register(formData);
 
       if (response.status === 201) {
-        // Store the JWT token
+        // Store the JWT token and user data
         localStorage.setItem("token", response.data.accessToken);
-        localStorage.setItem("user", JSON.stringify({
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName
-        }));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         
         alert("Account created successfully!");
         navigate("/home");
       }
     } catch (error) {
-      setApiError(error.response?.data?.error || "Registration failed. Please try again.");
+      const errorMessage = error.response?.data?.error || "Registration failed. Please try again.";
+      setApiError(errorMessage);
     } finally {
       setIsLoading(false);
     }

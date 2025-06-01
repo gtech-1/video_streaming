@@ -10,7 +10,7 @@ import {
   getAuth,
   GoogleAuthProvider, 
 } from "firebase/auth";
-import axios from "axios";
+import { authAPI } from "../../services/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -74,16 +73,12 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
-        formData
-      );
-
+      const response = await authAPI.login(formData);
+      
       if (response.status === 200) {
-        // Store the JWT token
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("token", response.data.accessToken);
-        storage.setItem("user", JSON.stringify(response.data.user));
+        // Store the JWT token and user data
+        localStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         
         alert("Login successful!");
         navigate("/home");
@@ -177,21 +172,6 @@ const Login = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
             </div>
-
-            {/* <div className="flex items-center justify-between w-full mt-2">
-              <label className="flex items-center text-sm">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="mr-2"
-                />
-                Remember me
-              </label>
-              <a href="/forgot-password" className="text-sm text-blue-400 hover:text-blue-300">
-                Forgot Password?
-              </a>
-            </div> */}
 
             <button
               type="submit"
