@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import image1 from "../../imgs/4.png";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
@@ -10,57 +10,112 @@ import {
   getAuth,
   GoogleAuthProvider, 
 } from "firebase/auth";
+import { authAPI } from "../../services/api";
+
 const Login = () => {
   const navigate = useNavigate();
-
-  const [existingEmail, setExistingEmail] = useState("");
-  const [existingPassword, setExistingPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
-  const handleLogin = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
 
-    if (!storedUser) {
-      alert("No account found! Please sign up first.");
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required fields validation
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setApiError("");
+    
+    if (!validateForm()) {
       return;
     }
 
-    if (storedUser.email === existingEmail && storedUser.password === existingPassword) {
-      alert("Login successful!");
-      localStorage.setItem("loggedInUser", JSON.stringify(storedUser));
-      navigate("/home");
-    } else {
-      alert("Invalid email or password.");
+    setIsLoading(true);
+    try {
+      const response = await authAPI.login(formData);
+      
+      if (response.status === 200) {
+        // Store the JWT token and user data
+        localStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        
+        alert("Login successful!");
+        navigate("/home");
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || "Login failed. Please try again.";
+      setApiError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const googleProvider = new GoogleAuthProvider();
   
-    const GoogleLogin = async () => {
-      try {
-        const result = await signInWithPopup(auth, googleProvider);
-        console.log(result.user);
-        navigate("/home");
-      } catch (error) {
-        console.log(error);
-      }
-    };
-  
-    const GitHubProvider = async () => {
-      try {
-        const provider = new GithubAuthProvider(); 
-        const result = await signInWithPopup(auth, provider);
-        const credential = GithubAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        let photoUrl = result.user.photoURL + "?height=500&access_token=" + token;
-        await updateProfile(auth.currentUser, { photoURL: photoUrl });
-        navigate("/home");
-      } catch (error) {
-        console.log(error);
-      }
-    };
-  
+  const GoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log(result.user);
+      navigate("/home");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  const GitHubProvider = async () => {
+    try {
+      const provider = new GithubAuthProvider(); 
+      const result = await signInWithPopup(auth, provider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      let photoUrl = result.user.photoURL + "?height=500&access_token=" + token;
+      await updateProfile(auth.currentUser, { photoURL: photoUrl });
+      navigate("/home");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center h-screen w-screen p-4">
@@ -72,19 +127,39 @@ const Login = () => {
             <p className="text-lg mt-2 text-center md:text-left">Welcome back,</p>
           </div>
 
-          <div className="flex flex-col w-full items-center">
-            <input
-              type="email"
-              placeholder="your@gmail.com"
-              className="p-2 rounded-md outline-none text-black mt-3 w-full"
-              onChange={(e) => setExistingEmail(e.target.value)}
-            />
+          {apiError && (
+            <div className="bg-red-500 text-white p-3 rounded-md w-full mb-4">
+              {apiError}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="flex flex-col w-full items-center">
+            <div className="w-full">
+              <input
+                type="email"
+                name="email"
+                placeholder="your@gmail.com"
+                className={`p-2 rounded-md outline-none text-black mt-3 w-full ${
+                  errors.email ? "border-2 border-red-500" : ""
+                }`}
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+
             <div className="relative mt-4 w-full">
               <input
                 type={showPassword ? "text" : "password"} 
+                name="password"
                 placeholder="********"
-                className="p-2 rounded-md outline-none text-black w-full"
-                onChange={(e) => setExistingPassword(e.target.value)} 
+                className={`p-2 rounded-md outline-none text-black w-full ${
+                  errors.password ? "border-2 border-red-500" : ""
+                }`}
+                value={formData.password}
+                onChange={handleInputChange}
               />
               <button
                 type="button"
@@ -93,13 +168,27 @@ const Login = () => {
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />} 
               </button>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
+
             <button
-              className="bg-blue-600 text-white p-2 rounded-md w-full mt-5"
-              onClick={handleLogin}
+              type="submit"
+              disabled={isLoading}
+              className={`bg-blue-600 text-white p-2 rounded-md w-full mt-5 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
+
+            <p className="text-sm mt-4">
+              Don't have an account?{" "}
+              <a href="/signin" className="text-blue-400 hover:text-blue-300">
+                Sign up
+              </a>
+            </p>
 
             <div className="flex items-center w-full mt-5 justify-center">
               <div className="border border-gray-500 w-20 h-[1px]"></div>
@@ -108,6 +197,7 @@ const Login = () => {
             </div>
 
             <button
+              type="button"
               onClick={GoogleLogin}
               className="flex items-center justify-center border border-gray-500 rounded-md bg-transparent text-gray-300 p-3 hover:bg-gray-800 transition mt-5 w-full"
             >
@@ -116,15 +206,15 @@ const Login = () => {
             </button>
 
             <button
+              type="button"
               onClick={GitHubProvider}
               className="flex items-center justify-center border border-gray-500 rounded-md bg-transparent text-gray-300 p-3 hover:bg-gray-800 transition mt-5 w-full"
             >
               <FaGithub className="text-xl mr-2" />
               Login with Github
             </button>
-          </div>
+          </form>
         </div>
-
 
         <div className="hidden md:flex rounded-lg w-[500px] h-[610px] -mr-8 items-center justify-center">
           <img

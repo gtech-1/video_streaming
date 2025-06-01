@@ -1,24 +1,24 @@
 {
-    "name": "Sam Wilson",
-    "email": "samwilson@gmail.com",
-    "photoUrl": "https://randomuser.me/api/portraits/men/33.jpg",
-    "address": "123 Main Street, New York, NY 10001",
-    "phone": "8765643456",
-    "dob": "1998-08-12",
-    "socialMedia": {
-      "facebook": "www.facebook.com",
-      "twitter": "www.twitter.com",
-      "linkedin": "www.linkedin.com",
-      "instagram": "www.instagram.com"
-    },
-    "courses": [
-      { "id": 1, "name": "Python Programming", "progress": 75 },
-      { "id": 2, "name": "Web Development", "progress": 50 },
-      { "id": 3, "name": "Data Structures", "progress": 90 }
-    ],
-    "loginActivity": {
-      "firstLogin": "2023-01-01 09:30 AM",
-      "lastLogin": "2024-04-02 10:15 AM"
-    }
+  "firstName": "Sam",
+  "lastName": "Wilson",
+  "email": "samwilson@gmail.com",
+  "photoUrl": "https://randomuser.me/api/portraits/men/33.jpg",
+  "address": "123 Main Street, New York, NY 10001",
+  "phone": "8765643456",
+  "dob": "1998-08-12",
+  "socialMedia": {
+    "facebook": "www.facebook.com",
+    "twitter": "www.twitter.com",
+    "linkedin": "www.linkedin.com",
+    "instagram": "www.instagram.com"
+  },
+  "courses": [
+    { "id": 1, "name": "Python Programming", "progress": 75 },
+    { "id": 2, "name": "Web Development", "progress": 50 },
+    { "id": 3, "name": "Data Structures", "progress": 90 }
+  ],
+  "loginActivity": {
+    "firstLogin": "2023-01-01 09:30 AM",
+    "lastLogin": "2024-04-02 10:15 AM"
   }
-  
+}
