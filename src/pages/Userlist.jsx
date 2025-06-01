@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { FiFilter, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { userAPI } from "../services/api";
+import { toast } from "react-hot-toast";
 
 // Ensure each user has a stable `id`
 const initializeUsers = (users) =>
@@ -49,7 +50,15 @@ const UserList = () => {
     async function loadMembers() {
       try {
         const res = await userAPI.getUsers();
-        const all = initializeUsers(res.data.data);
+        const all = res.data.map(user => ({
+          id: user._id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          mobile: user.mobile,
+          photo: user.photo,
+          status: user.status,
+          userType: user.userType
+        }));
         setMembers(all.filter((u) => u.userType === "members"));
       } catch (err) {
         console.error("Failed to load members:", err);
