@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import axios from "axios";
 import { FiFilter, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useSelector } from "react-redux";
+import { userAPI } from "../services/api";
 
 // Ensure each user has a stable `id`
 const initializeUsers = (users) =>
@@ -48,7 +48,7 @@ const UserList = () => {
   useEffect(() => {
     async function loadMembers() {
       try {
-        const res = await axios.get("http://localhost:3000/api/users");
+        const res = await userAPI.getUsers();
         const all = initializeUsers(res.data.data);
         setMembers(all.filter((u) => u.userType === "members"));
       } catch (err) {

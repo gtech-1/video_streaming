@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
 import {
   FaEdit,
   FaTrash,
@@ -21,6 +20,7 @@ import {
   FiMoreVertical,
 } from "react-icons/fi";
 import { useSelector } from "react-redux";
+import { userAPI } from "../services/api";
 
 // Ensure each user has a stable `id`
 const initializeUsers = (users) =>
@@ -101,9 +101,7 @@ const UserListAdmin = () => {
   useEffect(() => {
     async function load() {
       try {
-        const res = await axios.get(
-          "http://localhost:3000/api/users"
-        );
+        const res = await userAPI.getUsers();
         const all = initializeUsers(res.data.data);
         setMembers(
           all.filter((u) => u.userType === "members")
@@ -159,15 +157,7 @@ const UserListAdmin = () => {
   const handleAddUser = useCallback(
     async (newUser) => {
       try {
-        const res = await axios.post(
-          "http://localhost:3000/api/users/create",
-          newUser,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await userAPI.createUser(newUser);
         const created = res.data.data;
         const withId = { id: created._id, ...created };
         if (newUser.userType === "members") {
@@ -204,10 +194,7 @@ const UserListAdmin = () => {
       };
 
       try {
-        const res = await axios.put(
-          `http://localhost:3000/api/users/${selectedUser._id}`,
-          body
-        );
+        const res = await userAPI.updateUser(selectedUser._id, body);
         const updated = {
           id: res.data.data._id,
           ...res.data.data,
@@ -248,32 +235,33 @@ const UserListAdmin = () => {
   );
 
   // 4) Delete user → DELETE
-  const handleDeleteConfirm = useCallback(async () => {
-    try {
-      await axios.delete(
-        `http://localhost:3000/api/users/${selectedUser._id}`
-      );
-      if (userType === "members") {
-        setMembers((m) =>
-          m.filter((u) => u.id !== selectedUser.id)
+  const handleDeleteUser = useCallback(
+    async () => {
+      try {
+        await userAPI.deleteUser(selectedUser._id);
+        if (selectedUser.userType === "members") {
+          setMembers((m) =>
+            m.filter((u) => u.id !== selectedUser.id)
+          );
+        } else {
+          setAdmins((a) =>
+            a.filter((u) => u.id !== selectedUser.id)
+          );
+        }
+        toast.success("User deleted successfully");
+      } catch (err) {
+        console.error(err);
+        toast.error(
+          err.response?.data?.error ||
+            "Failed to delete user"
         );
-      } else {
-        setAdmins((a) =>
-          a.filter((u) => u.id !== selectedUser.id)
-        );
+      } finally {
+        setShowDeleteModal(false);
+        setSelectedUser(null);
       }
-      toast.success("User deleted");
-    } catch (err) {
-      console.error(err);
-      toast.error(
-        err.response?.data?.error ||
-          "Failed to delete user"
-      );
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedUser(null);
-    }
-  }, [selectedUser, userType]);
+    },
+    [selectedUser]
+  );
 
   const handleFilterStatus = (status) => {
     setFilterStatus(status);
@@ -850,7 +838,7 @@ const UserListAdmin = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleDeleteConfirm}
+                    onClick={handleDeleteUser}
                     className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Delete User
