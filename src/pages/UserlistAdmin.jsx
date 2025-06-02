@@ -21,6 +21,7 @@ import {
 } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { userAPI } from "../services/api";
+import Papa from 'papaparse';
 
 // Ensure each user has a stable `id`
 const initializeUsers = (users) =>
@@ -68,6 +69,9 @@ const UserListAdmin = () => {
   // Refs for outside clicks
   const filterRef = useRef(null);
   const moreOptionsRef = useRef(null);
+
+  // Add new state for file input
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const handle = (e) => {
@@ -292,6 +296,76 @@ const UserListAdmin = () => {
     setCurrentPage(1);
   };
 
+  // Export users to CSV
+  const handleExportUsers = async () => {
+    try {
+      const response = await userAPI.exportUsers();
+      const users = response.data;
+      
+      // Convert to CSV
+      const csv = Papa.unparse(users);
+      
+      // Create and download file
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `users_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success('Users exported successfully');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(error.response?.data?.message || 'Failed to export users');
+    }
+  };
+
+  // Import users from CSV
+  const handleImportUsers = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    Papa.parse(file, {
+      complete: async (results) => {
+        try {
+          const response = await userAPI.importUsers(results.data);
+          
+          if (response.data.errors.length > 0) {
+            toast.error(`${response.data.errors.length} users failed to import`);
+          }
+          
+          if (response.data.results.length > 0) {
+            toast.success(`${response.data.results.length} users imported successfully`);
+            // Refresh the user list
+            const res = await userAPI.getUsers();
+            const all = res.data.map(user => ({
+              id: user._id,
+              name: `${user.firstName} ${user.lastName}`,
+              email: user.email,
+              mobile: user.mobile,
+              photo: user.photo,
+              status: user.status,
+              userType: user.userType
+            }));
+            setMembers(all.filter((u) => u.userType === "members"));
+            setAdmins(all.filter((u) => u.userType === "admins"));
+          }
+        } catch (error) {
+          console.error('Import error:', error);
+          toast.error(error.response?.data?.message || 'Failed to import users');
+        }
+      },
+      header: true,
+      error: (error) => {
+        console.error('CSV parsing error:', error);
+        toast.error('Failed to parse CSV file');
+      }
+    });
+  };
+
   return (
     <div
       className={`min-h-screen bg-gray-100 dark:bg-gray-900 p-6 overflow-x-hidden ${
@@ -339,10 +413,7 @@ const UserListAdmin = () => {
                 <FaPlus className="mr-2" /> Add
               </button>
 
-              <div
-                className="block sm:hidden relative"
-                ref={moreOptionsRef}
-              >
+              <div className="block sm:hidden relative" ref={moreOptionsRef}>
                 <button
                   onClick={() => {
                     setShowMoreOptions((v) => !v);
@@ -354,10 +425,16 @@ const UserListAdmin = () => {
                 </button>
                 {showMoreOptions && (
                   <div className="absolute left-0 mt-2 w-40 bg-white dark:bg-gray-800 shadow-md rounded-lg border border-gray-200 dark:border-gray-700 z-10">
-                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <button 
+                      onClick={handleExportUsers}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
                       <FaDownload className="mr-2 inline-block" /> Export
                     </button>
-                    <button className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
                       <FaUpload className="mr-2 inline-block" /> Import
                     </button>
                   </div>
@@ -365,12 +442,27 @@ const UserListAdmin = () => {
               </div>
 
               <div className="hidden sm:flex gap-2">
-                <button className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700">
+                <button 
+                  onClick={handleExportUsers}
+                  className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
                   <FaDownload className="mr-2" /> Export
                 </button>
-                <button className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <FaUpload className="mr-2" /> Import
-                </button>
+                <div className="relative">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImportUsers}
+                    accept=".csv"
+                    className="hidden"
+                  />
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-white dark:bg-gray-800 dark:text-white px-3 py-1.5 rounded-lg text-sm flex items-center hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    <FaUpload className="mr-2" /> Import
+                  </button>
+                </div>
               </div>
             </div>
 
