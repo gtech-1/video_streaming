@@ -86,7 +86,8 @@ const OrganisationPage = () => {
       <div className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl mx-auto transition-all duration-300">
         {/* Header */}
         <div className="flex items-center mb-8">
-          <FiBriefcase className="text-2xl text-yellow-500 mr-2 flex-shrink-0" />
+          {/* Always blue, both light & dark */}
+          <FiBriefcase className="text-2xl text-blue-500 mr-2 flex-shrink-0" />
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-white truncate">
             Organisation Details
           </h2>
@@ -116,7 +117,7 @@ const OrganisationPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:focus:ring-yellow-900 transition-all duration-200 ease-in-out"
+                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:ring-blue-900 transition-all duration-200 ease-in-out"
                   placeholder="Enter organisation name"
                 />
               </div>
@@ -136,7 +137,7 @@ const OrganisationPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:focus:ring-yellow-900 transition-all duration-200 ease-in-out"
+                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:ring-blue-900 transition-all duration-200 ease-in-out"
                   placeholder="Enter contact email"
                 />
               </div>
@@ -155,7 +156,7 @@ const OrganisationPage = () => {
                   id="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:focus:ring-yellow-900 transition-all duration-200 ease-in-out"
+                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:ring-blue-900 transition-all duration-200 ease-in-out"
                   placeholder="Enter phone number"
                 />
               </div>
@@ -174,7 +175,7 @@ const OrganisationPage = () => {
                   id="address"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:focus:ring-yellow-900 transition-all duration-200 ease-in-out"
+                  className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:ring-blue-900 transition-all duration-200 ease-in-out"
                   placeholder="Enter address"
                 />
               </div>
@@ -194,7 +195,7 @@ const OrganisationPage = () => {
                 rows="4"
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-yellow-500 focus:ring focus:ring-yellow-200 dark:focus:ring-yellow-900 transition-all duration-200 ease-in-out"
+                className="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200 dark:focus:ring-blue-900 transition-all duration-200 ease-in-out"
                 placeholder="Brief description about the organisation"
               />
             </div>
@@ -222,7 +223,12 @@ const OrganisationPage = () => {
                 id="logo"
                 accept="image/*"
                 onChange={handleChange}
-                className="w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gray-200 dark:file:bg-gray-600 file:text-gray-900 dark:file:text-gray-100 hover:file:bg-yellow-100 dark:hover:file:bg-yellow-900 transition-all duration-200 ease-in-out"
+                className="w-full text-sm text-gray-700 dark:text-gray-300 
+                           file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 
+                           file:text-sm file:font-medium file:bg-gray-200 dark:file:bg-gray-600 
+                           file:text-gray-900 dark:file:text-gray-100 
+                           hover:file:bg-blue-100 dark:hover:file:bg-blue-900 
+                           transition-all duration-200 ease-in-out"
               />
             </div>
 
@@ -236,7 +242,7 @@ const OrganisationPage = () => {
                 className={`w-full flex justify-center items-center gap-2 px-4 py-3 rounded-2xl text-white font-medium transition-all duration-200 ease-in-out ${
                   submitting
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-yellow-500 hover:bg-yellow-600"
+                    : "bg-blue-500 hover:bg-blue-600"
                 }`}
               >
                 {submitting ? "Sending..." : "Send"}
