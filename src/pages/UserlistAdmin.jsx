@@ -6,7 +6,6 @@ import React, {
   useEffect,
 } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import axios from "axios";
 import {
   FaEdit,
   FaTrash,
@@ -21,6 +20,7 @@ import {
   FiMoreVertical,
 } from "react-icons/fi";
 import { useSelector } from "react-redux";
+import { userAPI } from "../services/api";
 
 // Ensure each user has a stable `id`
 const initializeUsers = (users) =>
@@ -101,21 +101,28 @@ const UserListAdmin = () => {
   useEffect(() => {
     async function load() {
       try {
-        const res = await axios.get(
-          "http://localhost:3000/api/users"
-        );
-        const all = initializeUsers(res.data.data);
-        setMembers(
-          all.filter((u) => u.userType === "members")
-        );
-        setAdmins(
-          all.filter((u) => u.userType === "admins")
-        );
+        const res = await userAPI.getUsers();
+        const all = res.data.map(user => ({
+          id: user._id,
+          name: `${user.firstName} ${user.lastName}`,
+          email: user.email,
+          mobile: user.mobile,
+          photo: user.photo,
+          status: user.status,
+          userType: user.userType
+        }));
+        setMembers(all.filter((u) => u.userType === "members"));
+        setAdmins(all.filter((u) => u.userType === "admins"));
       } catch (err) {
-        console.error(err);
+        console.error("Error loading users:", {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status,
+          headers: err.response?.headers
+        });
         toast.error(
           err.response?.data?.error ||
-            "Failed to load users"
+            "Failed to load users. Please check your connection and try again."
         );
       }
     }
@@ -159,17 +166,17 @@ const UserListAdmin = () => {
   const handleAddUser = useCallback(
     async (newUser) => {
       try {
-        const res = await axios.post(
-          "http://localhost:3000/api/users/create",
-          newUser,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const created = res.data.data;
-        const withId = { id: created._id, ...created };
+        const res = await userAPI.createUser(newUser);
+        const created = res.data;
+        const withId = {
+          id: created._id,
+          name: `${created.firstName} ${created.lastName}`,
+          email: created.email,
+          mobile: created.mobile,
+          photo: created.photo,
+          status: created.status,
+          userType: created.userType
+        };
         if (newUser.userType === "members") {
           setMembers((prev) => [withId, ...prev]);
         } else {
@@ -195,22 +202,25 @@ const UserListAdmin = () => {
       e.preventDefault();
       const form = e.target;
       const body = {
-        name: form.name.value,
+        firstName: form.firstName.value,
+        lastName: form.lastName.value,
         email: form.email.value,
-        mobile: form.mobile.value,
-        photo: form.photo.value,
+        phone: form.mobile.value,
+        photoUrl: form.photo.value,
         status: form.status.value,
         userType: form.userType.value,
       };
 
       try {
-        const res = await axios.put(
-          `http://localhost:3000/api/users/${selectedUser._id}`,
-          body
-        );
+        const res = await userAPI.updateUser(selectedUser.id, body);
         const updated = {
-          id: res.data.data._id,
-          ...res.data.data,
+          id: res.data._id,
+          name: `${res.data.firstName} ${res.data.lastName}`,
+          email: res.data.email,
+          mobile: res.data.mobile,
+          photo: res.data.photo,
+          status: res.data.status,
+          userType: res.data.userType,
         };
 
         if (updated.userType === "members") {
@@ -248,32 +258,33 @@ const UserListAdmin = () => {
   );
 
   // 4) Delete user → DELETE
-  const handleDeleteConfirm = useCallback(async () => {
-    try {
-      await axios.delete(
-        `http://localhost:3000/api/users/${selectedUser._id}`
-      );
-      if (userType === "members") {
-        setMembers((m) =>
-          m.filter((u) => u.id !== selectedUser.id)
+  const handleDeleteUser = useCallback(
+    async () => {
+      try {
+        await userAPI.deleteUser(selectedUser.id);
+        if (selectedUser.userType === "members") {
+          setMembers((m) =>
+            m.filter((u) => u.id !== selectedUser.id)
+          );
+        } else {
+          setAdmins((a) =>
+            a.filter((u) => u.id !== selectedUser.id)
+          );
+        }
+        toast.success("User deleted successfully");
+      } catch (err) {
+        console.error(err);
+        toast.error(
+          err.response?.data?.error ||
+            "Failed to delete user"
         );
-      } else {
-        setAdmins((a) =>
-          a.filter((u) => u.id !== selectedUser.id)
-        );
+      } finally {
+        setShowDeleteModal(false);
+        setSelectedUser(null);
       }
-      toast.success("User deleted");
-    } catch (err) {
-      console.error(err);
-      toast.error(
-        err.response?.data?.error ||
-          "Failed to delete user"
-      );
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedUser(null);
-    }
-  }, [selectedUser, userType]);
+    },
+    [selectedUser]
+  );
 
   const handleFilterStatus = (status) => {
     setFilterStatus(status);
@@ -602,12 +613,11 @@ const UserListAdmin = () => {
                   e.preventDefault();
                   const form = e.target;
                   const newUser = {
-                    name: form.name.value,
+                    firstName: form.firstName.value,
+                    lastName: form.lastName.value,
                     email: form.email.value,
-                    mobile: form.mobile.value,
-                    photo:
-                      form.photo.value ||
-                      "https://via.placeholder.com/150",
+                    phone: form.mobile.value,
+                    photoUrl: form.photo.value || "https://via.placeholder.com/150",
                     status: form.status.value,
                     userType: form.userType.value,
                   };
@@ -615,17 +625,31 @@ const UserListAdmin = () => {
                 }}
                 className="p-4 space-y-3"
               >
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Name
-                  </label>
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder="Enter name"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      name="firstName"
+                      type="text"
+                      required
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      name="lastName"
+                      type="text"
+                      required
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      placeholder="Enter last name"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -719,16 +743,29 @@ const UserListAdmin = () => {
                 </h2>
               </div>
               <form onSubmit={handleEditSubmit} className="p-4 space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Name
-                  </label>
-                  <input
-                    name="name"
-                    defaultValue={selectedUser.name}
-                    required
-                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      name="firstName"
+                      defaultValue={selectedUser.name.split(' ')[0]}
+                      required
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      name="lastName"
+                      defaultValue={selectedUser.name.split(' ').slice(1).join(' ')}
+                      required
+                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -850,7 +887,7 @@ const UserListAdmin = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleDeleteConfirm}
+                    onClick={handleDeleteUser}
                     className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Delete User
