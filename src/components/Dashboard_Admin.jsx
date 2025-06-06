@@ -10,7 +10,7 @@ import CgpaLineGraph from "./CgpaLineGraph";
 import StatsCards from "./StatsCards";
 import FrequentlyAskedQuestions from "./FrequentlyAskedQuestions";
 import FeedbackPanel from "./Dashboard_adm/FeedbackPanel";
-//admin
+
 import AdminStatsCards from "./Dashboard_adm/AdminStatsCards";
 import DailyWeeklySummary from "./Dashboard_adm/DailyWeeklySummary";
 import NotificationBroadcaster from "./Dashboard_adm/NotificationBroadcasrer";

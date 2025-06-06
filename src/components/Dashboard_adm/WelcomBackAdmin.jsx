@@ -1,5 +1,5 @@
 import React from "react";
-import AdminIllustration from "../../assets/rr.svg"; // Replace with actual path or illustration
+import AdminIllustration from "../../assets/rr.svg"; 
 
 const WelcomeBackAdmin = () => {
   return (
