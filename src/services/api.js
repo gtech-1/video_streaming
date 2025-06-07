@@ -31,7 +31,17 @@ export const authAPI = {
     login: (data) => api.post('/auth/login', data),
     register: (data) => api.post('/auth/register', data),
     getProfile: () => api.get('/profile'),
-    updateProfile: (data) => api.put('/profile', data),
+    updateProfile: (data) => {
+        // If data is FormData, don't set Content-Type header
+        if (data instanceof FormData) {
+            return api.put('/profile', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
+        return api.put('/profile', data);
+    },
     updatePassword: (data) => api.put('/profile/password', data)
 };
 

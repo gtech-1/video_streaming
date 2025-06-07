@@ -15,7 +15,8 @@ import {
   FaSignOutAlt,
   FaPencilAlt,
   FaCheck,
-  FaTimes
+  FaTimes,
+  FaSpinner
 } from 'react-icons/fa';
 import { authAPI } from '../services/api';
 
@@ -41,6 +42,8 @@ const useOutsideClick = (ref, callback) => {
 const ProfileInfoSection = ({ profileData, setProfileData }) => {
   const [editingField, setEditingField] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   // Temporary state for edited values
   const [editValues, setEditValues] = useState({
@@ -71,6 +74,7 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
         ...prev,
         photoUrl: profileData.photoUrl
       }));
+      setImagePreview(null);
     } else {
       setEditValues((prev) => ({
         ...prev,
@@ -98,39 +102,85 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
     }
   };
 
+  // Handle file input change
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please upload a valid image file (JPEG, PNG)');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('File size should be less than 5MB');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Update edit values
+    setEditValues(prev => ({
+      ...prev,
+      photoUrl: file
+    }));
+  };
+
   // Save the edited field
   const handleSaveField = async (field) => {
     setIsLoading(true);
     try {
-      const updatedData = {
-        ...profileData,
-        ...(field === 'socialMedia'
-          ? { socialMedia: editValues.socialMedia }
-          : { [field]: editValues[field] })
-      };
-
-      const response = await authAPI.updateProfile(updatedData);
-      
-      if (response.status === 200) {
-        setProfileData(response.data.user);
-        setEditingField(null);
-
-        // For toast message, capitalize label
-        let label;
-        switch (field) {
-          case 'photoUrl':
-            label = 'Profile Picture URL';
-            break;
-          case 'firstName':
-            label = 'First Name';
-            break;
-          case 'lastName':
-            label = 'Last Name';
-            break;
-          default:
-            label = field.charAt(0).toUpperCase() + field.slice(1);
+      if (field === 'photoUrl') {
+        const formData = new FormData();
+        formData.append('photo', editValues.photoUrl);
+        
+        const response = await authAPI.updateProfile(formData);
+        if (response.status === 200) {
+          setProfileData(response.data.user);
+          setEditingField(null);
+          setImagePreview(null);
+          toast.success('Profile picture updated successfully!');
         }
-        toast.success(`${label} updated successfully!`);
+      } else {
+        const updatedData = {
+          ...profileData,
+          ...(field === 'socialMedia'
+            ? { socialMedia: editValues.socialMedia }
+            : { [field]: editValues[field] })
+        };
+
+        const response = await authAPI.updateProfile(updatedData);
+        
+        if (response.status === 200) {
+          setProfileData(response.data.user);
+          setEditingField(null);
+
+          // For toast message, capitalize label
+          let label;
+          switch (field) {
+            case 'photoUrl':
+              label = 'Profile Picture';
+              break;
+            case 'firstName':
+              label = 'First Name';
+              break;
+            case 'lastName':
+              label = 'Last Name';
+              break;
+            default:
+              label = field.charAt(0).toUpperCase() + field.slice(1);
+          }
+          toast.success(`${label} updated successfully!`);
+        }
       }
     } catch (error) {
       toast.error(error.response?.data?.error || 'Failed to update profile');
@@ -303,75 +353,92 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
     </div>
   );
 
-  return (
-    <div className="space-y-6 sm:space-y-8">
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-        Profile Information
-      </h2>
-
-      {/* ====== Profile Photo Section (edited) ====== */}
-      <div className="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
-        <div className="flex justify-between items-center mb-3 sm:mb-4">
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
-            Profile Photo
-          </h3>
-          {editingField !== 'photoUrl' && (
-            <button
-              onClick={() => handleEditClick('photoUrl')}
-              className="text-blue-600 dark:text-blue-400"
-            >
-              <FaPencilAlt size={14} className="sm:text-base" />
-            </button>
-          )}
-        </div>
-        {editingField === 'photoUrl' ? (
-          <div className="mt-2">
-            <input
-              type="text"
-              value={editValues.photoUrl}
-              onChange={(e) => handleInputChange(e, 'photoUrl')}
-              className="block w-full p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
-              placeholder="Paste image URL here"
-            />
-            <div className="flex space-x-2 mt-2">
-              <button
-                onClick={() => handleSaveField('photoUrl')}
-                className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-green-500 text-white rounded-md text-xs sm:text-sm"
-              >
-                <FaCheck className="mr-1" size={10} /> Save
-              </button>
-              <button
-                onClick={handleCancelEdit}
-                className="flex items-center justify-center px-2 py-1 sm:px-3 sm:py-1 bg-red-500 text-white rounded-md text-xs sm:text-sm"
-              >
-                <FaTimes className="mr-1" size={10} /> Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center">
-            <div className="mr-3 sm:mr-4">
-              <img
-                src={profileData.photoUrl}
-                alt="Profile"
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
-              />
-            </div>
-          </div>
+  // Render profile photo section
+  const renderProfilePhotoSection = () => (
+    <div className="border-b border-gray-200 dark:border-gray-700 pb-4 sm:pb-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
+          Profile Photo
+        </h3>
+        {editingField !== 'photoUrl' && (
+          <button
+            onClick={() => handleEditClick('photoUrl')}
+            className="text-blue-600 dark:text-blue-400"
+          >
+            <FaPencilAlt size={14} className="sm:text-base" />
+          </button>
         )}
       </div>
 
-      {/* First Name and Last Name Sections */}
+      {editingField === 'photoUrl' ? (
+        <div className="mt-4">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative w-32 h-32 rounded-full overflow-hidden">
+              <img
+                src={imagePreview || profileData.photoUrl}
+                alt="Profile preview"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/jpeg,image/png,image/jpg"
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Choose Image
+            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleSaveField('photoUrl')}
+                disabled={isLoading}
+                className="flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <FaSpinner className="animate-spin mr-2" />
+                ) : (
+                  <FaCheck className="mr-2" />
+                )}
+                Save
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+              >
+                <FaTimes className="mr-2" />
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <div className="w-32 h-32 rounded-full overflow-hidden">
+            <img
+              src={profileData.photoUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {renderProfilePhotoSection()}
       {renderFieldSection('firstName', 'First Name')}
       {renderFieldSection('lastName', 'Last Name')}
-
-      {/* Email, Address, Phone, DOB */}
-      {renderFieldSection('email', 'Email address', 'email')}
+      {renderFieldSection('email', 'Email', 'email')}
+      {renderFieldSection('phone', 'Phone Number', 'tel')}
       {renderFieldSection('address', 'Address', 'textarea')}
-      {renderFieldSection('phone', 'Phone number', 'tel')}
       {renderFieldSection('dob', 'Date of Birth', 'date')}
-
-      {/* Social Media Section */}
       {renderSocialMediaSection()}
     </div>
   );
