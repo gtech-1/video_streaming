@@ -16,7 +16,8 @@ import {
   FaPencilAlt,
   FaCheck,
   FaTimes,
-  FaSpinner
+  FaSpinner,
+  FaUpload
 } from 'react-icons/fa';
 import { authAPI } from '../services/api';
 
@@ -103,7 +104,7 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
   };
 
   // Handle file input change
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -128,11 +129,22 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
     };
     reader.readAsDataURL(file);
 
-    // Update edit values
-    setEditValues(prev => ({
-      ...prev,
-      photoUrl: file
-    }));
+    // Upload the file immediately
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append('photo', file);
+      
+      const response = await authAPI.updateProfile(formData);
+      if (response.status === 200) {
+        setProfileData(response.data.user);
+        toast.success('Profile picture updated successfully!');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Failed to update profile picture');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Save the edited field
@@ -360,73 +372,41 @@ const ProfileInfoSection = ({ profileData, setProfileData }) => {
         <h3 className="text-base sm:text-lg font-medium text-gray-900 dark:text-white">
           Profile Photo
         </h3>
-        {editingField !== 'photoUrl' && (
-          <button
-            onClick={() => handleEditClick('photoUrl')}
-            className="text-blue-600 dark:text-blue-400"
-          >
-            <FaPencilAlt size={14} className="sm:text-base" />
-          </button>
-        )}
       </div>
 
-      {editingField === 'photoUrl' ? (
-        <div className="mt-4">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden">
-              <img
-                src={imagePreview || profileData.photoUrl}
-                alt="Profile preview"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/jpeg,image/png,image/jpg"
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              Choose Image
-            </button>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleSaveField('photoUrl')}
-                disabled={isLoading}
-                className="flex items-center justify-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors disabled:opacity-50"
-              >
-                {isLoading ? (
-                  <FaSpinner className="animate-spin mr-2" />
-                ) : (
-                  <FaCheck className="mr-2" />
-                )}
-                Save
-              </button>
-              <button
-                onClick={handleCancelEdit}
-                className="flex items-center justify-center px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-              >
-                <FaTimes className="mr-2" />
-                Cancel
-              </button>
-            </div>
-          </div>
+      <div className="mt-4 flex items-center space-x-4">
+        <div className="relative">
+          <img
+            src={imagePreview || profileData.photoUrl}
+            alt="Profile"
+            className="w-24 h-24 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+          />
         </div>
-      ) : (
-        <div className="mt-4">
-          <div className="w-32 h-32 rounded-full overflow-hidden">
-            <img
-              src={profileData.photoUrl}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="flex flex-col space-y-2">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/jpeg,image/png,image/jpg"
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isLoading}
+            className="flex items-center justify-center px-3 py-1.5 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <FaSpinner className="animate-spin mr-1.5" size={12} />
+            ) : (
+              <FaUpload className="mr-1.5" size={12} />
+            )}
+            Upload Photo
+          </button>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Max file size: 5MB
+          </p>
         </div>
-      )}
+      </div>
     </div>
   );
 
