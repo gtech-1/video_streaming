@@ -9,11 +9,13 @@ import CourseVideos from "../components/CourseVideos";
 import UserList from "../pages/Userlist"; // Ensure correct import path
 import ProfilePage from "../pages/ProfilePage"; // Import the ProfilePage component
 import RoleRoute from "./RoleRoute";
+import OrganisationPage from "../pages/OrganisationPage"
+import CourseVideosAdmin from "../components/CourseVideosAdmin";
 import UserListWrapper from "./UserListWrapper";
 
 const router = createBrowserRouter([
-  { path: "/", element: <Landing /> },            
-  { path: "/signin", element: <SignIn /> },           
+  { path: "/", element: <Landing /> },
+  { path: "/signUp", element: <SignIn /> },
   { path: "/login", element: <Login /> },
   {
     path: "/home",
@@ -22,7 +24,7 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to="dashboard" /> },
       { path: "menu", element: <MenuPage /> },
       { path: "dashboard", element: <Dashboard /> },
-       {
+      {
         path: "userlist",
         element: (
           <RoleRoute allowedRoles={["admin", "user"]}>
@@ -30,11 +32,11 @@ const router = createBrowserRouter([
           </RoleRoute>
         ),
       },
-      { path: "courses/:id", element: <CourseVideos /> },
-      { path: "profile", element: <ProfilePage /> }, 
+      { path: "courses/:id", element: <CourseVideosAdmin /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "organisation", element: <OrganisationPage /> },
     ],
   },
 ]);
 
 export default router;
-

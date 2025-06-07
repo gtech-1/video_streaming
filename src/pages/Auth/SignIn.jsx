@@ -10,10 +10,9 @@ import {
   getAuth,
   GoogleAuthProvider, 
 } from "firebase/auth";
-
 import { GithubAuthProvider, signInWithPopup } from 'firebase/auth';
-
 import { auth } from "../../../utils/firebase";
+import { authAPI } from "../../services/api";
 
 const images = [
   { id: 1, src: image1 },
@@ -22,21 +21,93 @@ const images = [
 ];
 
 const SignIn = () => {
-  
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: ""
+  });
+  const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
+    const user = localStorage.getItem("user");
+    if (user && user !=="undefined") {
+      const userData=JSON.parse(user);
       navigate("/home");
     }
   }, [navigate]);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Required fields validation
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // Password strength validation
+    if (formData.password && formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters long";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setApiError("");
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await authAPI.register(formData);
+
+      if (response.status === 201) {
+        // Store the JWT token and user data
+        localStorage.setItem("token", response.data.accessToken);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        
+        alert("Account created successfully!");
+        navigate("/home");
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || "Registration failed. Please try again.";
+      setApiError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const googleProvider = new GoogleAuthProvider();
 
@@ -62,14 +133,6 @@ const SignIn = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-
-  const handleSignUp = () => {
-    const userDetails = { email, password, firstName, lastName };
-    localStorage.setItem("user", JSON.stringify(userDetails));
-    alert("Account created successfully!");
-    navigate("/login");
   };
 
   useEffect(() => {
@@ -115,51 +178,99 @@ const SignIn = () => {
             <a href="/login" className="text-yellow-400">Log In</a>
           </p>
 
-          <div className="flex flex-col md:flex-row gap-4">
-            <input
-              type="text"
-              placeholder="First Name"
-              className="p-2 md:p-3 rounded-sm outline-none text-black w-full"
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              className="p-2 md:p-3 rounded-sm outline-none text-black w-full"
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
+          {apiError && (
+            <div className="bg-red-500 text-white p-3 rounded-sm mb-4">
+              {apiError}
+            </div>
+          )}
 
-          <input
-            type="email"
-            placeholder="your@gmail.com"
-            className="p-2 md:p-3 rounded-sm outline-none text-black mt-4 md:mt-5 w-full"
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="First Name"
+                  className={`p-2 md:p-3 rounded-sm outline-none text-black w-full ${
+                    errors.firstName ? "border-2 border-red-500" : ""
+                  }`}
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+                )}
+              </div>
+              <div className="w-full">
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Last Name"
+                  className={`p-2 md:p-3 rounded-sm outline-none text-black w-full ${
+                    errors.lastName ? "border-2 border-red-500" : ""
+                  }`}
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+                )}
+              </div>
+            </div>
 
-          <div className="relative mt-4 md:mt-5 w-full">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="********"
-              className="p-2 md:p-3 rounded-sm outline-none text-black w-full"
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div>
+              <input
+                type="email"
+                name="email"
+                placeholder="your@gmail.com"
+                className={`p-2 md:p-3 rounded-sm outline-none text-black w-full ${
+                  errors.email ? "border-2 border-red-500" : ""
+                }`}
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="********"
+                className={`p-2 md:p-3 rounded-sm outline-none text-black w-full ${
+                  errors.password ? "border-2 border-red-500" : ""
+                }`}
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-gray-400"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
+            </div>
+
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-gray-400"
+              type="submit"
+              disabled={isLoading}
+              className={`bg-blue-600 text-white p-2 md:p-3 rounded-sm w-full mt-5 ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {isLoading ? "Creating Account..." : "Create your Account"}
             </button>
-          </div>
+          </form>
 
-          <button className="bg-blue-600 text-white p-2 md:p-3 rounded-sm w-full mt-5" onClick={handleSignUp}>
-            Create your Account
-          </button>
-
-          <div className="flex items-center w-full justify-center mt-5 ">
+          <div className="flex items-center w-full justify-center mt-5">
             <div className="border border-gray-500 w-20 h-[1px]"></div>
-            <div className="mx-2 text-gray-500 ">or register with</div>
+            <div className="mx-2 text-gray-500">or register with</div>
             <div className="border border-gray-500 w-20 h-[1px]"></div>
           </div>
 
@@ -174,8 +285,8 @@ const SignIn = () => {
           <button
             onClick={GitHubProvider}
             className="flex items-center justify-center w-full border border-gray-500 rounded-md bg-transparent text-gray-300 p-2 md:p-3 hover:bg-gray-800 transition mt-5"
-           >
-           < FaGithub className="text-xl mr-2" />
+          >
+            <FaGithub className="text-xl mr-2" />
             Sign in with Github
           </button>
         </div>
