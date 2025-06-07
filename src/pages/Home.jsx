@@ -11,8 +11,7 @@ const Home = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);
   };
-const data=localStorage.getItem("user");
-  console.log("User data:", JSON.parse(data));
+
   return (
     // Outer wrapper with dark mode background and top padding for the Navbar.
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 pt-16 flex relative">

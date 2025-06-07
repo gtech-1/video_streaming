@@ -4,14 +4,13 @@ import SignIn from "../pages/Auth/SignIn";
 import Login from "../pages/Auth/Login";
 import Home from "../pages/Home";
 import MenuPage from "../pages/MenuPage";
-import Dashboard from "../components/Dashboard";
-import CourseVideos from "../components/CourseVideos";
-import UserList from "../pages/Userlist"; // Ensure correct import path
 import ProfilePage from "../pages/ProfilePage"; // Import the ProfilePage component
 import RoleRoute from "./RoleRoute";
 import OrganisationPage from "../pages/OrganisationPage"
 import CourseVideosAdmin from "../components/CourseVideosAdmin";
 import UserListWrapper from "./UserListWrapper";
+import AuthProtectedRoute from "./AuthProtectedRoute";
+import DashboardWrapper from "./DashboardWrapper";
 
 const router = createBrowserRouter([
   { path: "/", element: <Landing /> },
@@ -19,11 +18,18 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   {
     path: "/home",
-    element: <Home />,
+    element: (
+      <AuthProtectedRoute>
+        <Home />
+      </AuthProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="dashboard" /> },
       { path: "menu", element: <MenuPage /> },
-      { path: "dashboard", element: <Dashboard /> },
+      { path: "dashboard", element: 
+      (<RoleRoute allowedRoles={["admin", "user"]}>
+            <DashboardWrapper />
+          </RoleRoute>) },
       {
         path: "userlist",
         element: (

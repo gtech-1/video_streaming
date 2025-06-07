@@ -1,12 +1,10 @@
 // AuthContext.js
 import React, { createContext, useContext, useEffect ,useState} from "react";
-
-
 const AuthContext = createContext(null); 
 
 export const AuthProvider = ({ children, value }) => {
     const [user, setUser] = useState(null);
-console.log("AuthProvider user:", user);
+
  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     console.log("Stored user:", storedUser);

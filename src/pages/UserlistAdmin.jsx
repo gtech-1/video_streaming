@@ -47,9 +47,9 @@ console.log("UserListAdmin component rendered");
   }, []);
 
   // Core data
-  const [members, setMembers] = useState([]);
-  const [admins, setAdmins] = useState([]);
-  const [userType, setUserType] = useState("members");
+  const [user, setMembers] = useState([]);
+  const [admin, setAdmins] = useState([]);
+  const [userType, setUserType] = useState("user");
 
   // Filters & pagination
   const [showFilters, setShowFilters] = useState(false);
@@ -115,8 +115,8 @@ console.log("UserListAdmin component rendered");
           status: user.status,
           userType: user.userType
         }));
-        setMembers(all.filter((u) => u.userType === "members"));
-        setAdmins(all.filter((u) => u.userType === "admins"));
+        setMembers(all.filter((u) => u.userType === "user"));
+        setAdmins(all.filter((u) => u.userType === "admin"));
       } catch (err) {
         console.error("Error loading users:", {
           message: err.message,
@@ -136,8 +136,8 @@ console.log("UserListAdmin component rendered");
   // Derived data
   const currentData = useMemo(
     () =>
-      userType === "members" ? members : admins,
-    [userType, members, admins]
+      userType === "user" ? user : admin,
+    [userType, user, admin]
   );
   const filteredData = useMemo(() => {
     if (filterStatus === "all") return currentData;
@@ -181,7 +181,7 @@ console.log("UserListAdmin component rendered");
           status: created.status,
           userType: created.userType
         };
-        if (newUser.userType === "members") {
+        if (newUser.userType === "user") {
           setMembers((prev) => [withId, ...prev]);
         } else {
           setAdmins((prev) => [withId, ...prev]);
@@ -227,7 +227,7 @@ console.log("UserListAdmin component rendered");
           userType: res.data.userType,
         };
 
-        if (updated.userType === "members") {
+        if (updated.userType === "user") {
           setMembers((m) =>
             m
               .filter((u) => u.id !== updated.id)
@@ -266,7 +266,7 @@ console.log("UserListAdmin component rendered");
     async () => {
       try {
         await userAPI.deleteUser(selectedUser.id);
-        if (selectedUser.userType === "members") {
+        if (selectedUser.userType === "user") {
           setMembers((m) =>
             m.filter((u) => u.id !== selectedUser.id)
           );
@@ -350,8 +350,8 @@ console.log("UserListAdmin component rendered");
               status: user.status,
               userType: user.userType
             }));
-            setMembers(all.filter((u) => u.userType === "members"));
-            setAdmins(all.filter((u) => u.userType === "admins"));
+            setMembers(all.filter((u) => u.userType === "user"));
+            setAdmins(all.filter((u) => u.userType === "admin"));
           }
         } catch (error) {
           console.error('Import error:', error);
@@ -380,27 +380,27 @@ console.log("UserListAdmin component rendered");
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() =>
-                handleUserTypeChange("members")
+                handleUserTypeChange("user")
               }
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "members"
+                userType === "user"
                   ? "bg-blue-600 text-white"
                   : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white"
               }`}
             >
-              Members ({members.length})
+              Members ({user.length})
             </button>
             <button
               onClick={() =>
-                handleUserTypeChange("admins")
+                handleUserTypeChange("admin")
               }
               className={`px-3 py-1.5 rounded-lg text-sm ${
-                userType === "admins"
+                userType === "admin"
                   ? "bg-blue-600 text-white"
                   : "bg-white text-gray-700 dark:bg-gray-800 dark:text-white"
               }`}
             >
-              Admins ({admins.length})
+              Admins ({admin.length})
             </button>
           </div>
 
@@ -915,8 +915,8 @@ console.log("UserListAdmin component rendered");
                       defaultValue={selectedUser.userType}
                       className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                     >
-                      <option value="members">Member</option>
-                      <option value="admins">Admin</option>
+                      <option value="user">Member</option>
+                      <option value="admin">Admin</option>
                     </select>
                   </div>
                 </div>
