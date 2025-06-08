@@ -13,6 +13,7 @@ const initializeUsers = (users) =>
 
 const UserList = () => {
   const isSidebarOpen = useSelector((state) => state.sidebar?.isOpen ?? true);
+  console.log("UserList component rendered");
 
   // Track desktop vs. mobile layout
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280);
@@ -22,12 +23,12 @@ const UserList = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Core data: only "members" type
-  const [members, setMembers] = useState([]);
+  // Core data: only "user" type
+  const [user, setMembers] = useState([]);
 
   // Filters & pagination
   const [showFilters, setShowFilters] = useState(false);
-  const [filterStatus, setFilterStatus] = useState("all"); // "all", "active", "inactive"
+  const [filterStatus, setFilterStatus] = useState("all"); 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 10;
 
@@ -45,36 +46,46 @@ const UserList = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Fetch all members on mount (read‐only)
-  useEffect(() => {
-    async function loadMembers() {
-      try {
-        const res = await userAPI.getUsers();
-        const all = res.data.map(user => ({
-          id: user._id,
-          name: `${user.firstName} ${user.lastName}`,
-          email: user.email,
-          mobile: user.mobile,
-          photo: user.photo,
-          status: user.status,
-          userType: user.userType
-        }));
-        setMembers(all.filter((u) => u.userType === "members"));
-      } catch (err) {
-        console.error("Failed to load members:", err);
+  // Fetch all user on mount (read‐only)
+ useEffect(() => {
+  async function loadMembers() {
+    try {
+      const res = await userAPI.getUsers();
+      const usersArray = Array.isArray(res?.data) ? res.data : res?.data?.users;
+
+      if (!Array.isArray(usersArray)) {
+        console.error("Expected an array but got:", res.data);
+        return;
       }
+
+      const all = usersArray.map(user => ({
+        id: user._id,
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        mobile: user.mobile,
+        photo: user.photo,
+        status: user.status,
+        userType: user.userType
+      }));
+
+      setMembers(all.filter((u) => u.userType === "user"));
+    } catch (err) {
+      console.error("Failed to load user:", err);
     }
-    loadMembers();
-  }, []);
+  }
+
+  loadMembers();
+}, []);
+
 
   // Apply status filter ("all" / "active" / "inactive")
   const filteredData = useMemo(() => {
-    if (filterStatus === "all") return members;
+    if (filterStatus === "all") return user;
     if (filterStatus === "active") {
-      return members.filter((u) => u.status === "Active");
+      return user.filter((u) => u.status === "Active");
     }
-    return members.filter((u) => u.status !== "Active");
-  }, [members, filterStatus]);
+    return user.filter((u) => u.status !== "Active");
+  }, [user, filterStatus]);
 
   // Pagination: calculate pages & slice data
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);

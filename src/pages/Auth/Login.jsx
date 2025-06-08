@@ -11,6 +11,7 @@ import {
   GoogleAuthProvider, 
 } from "firebase/auth";
 import { authAPI } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,9 +23,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
-
+    const { setUser } = useAuth(); 
   useEffect(() => {
-    // Check if user is already logged in
     const token = localStorage.getItem("token");
     if (token) {
       navigate("/home");
@@ -79,9 +79,12 @@ const Login = () => {
         // Store the JWT token and user data
         localStorage.setItem("token", response.data.accessToken);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-        
+        const userData=JSON.stringify(response.data.user);
+        console.log(userData)
+        setUser(userData);
         alert("Login successful!");
         navigate("/home");
+        location.reload()
       }
     } catch (error) {
       const errorMessage = error.response?.data?.error || "Login failed. Please try again.";
@@ -185,7 +188,7 @@ const Login = () => {
 
             <p className="text-sm mt-4">
               Don't have an account?{" "}
-              <a href="/signin" className="text-blue-400 hover:text-blue-300">
+              <a href="/signUp" className="text-blue-400 hover:text-blue-300">
                 Sign up
               </a>
             </p>
