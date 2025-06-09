@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthData } from '../utils/auth';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL + '/api'
@@ -19,8 +20,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             // Handle token expiration
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            clearAuthData();
             window.location.href = '/login';
         }
         return Promise.reject(error);

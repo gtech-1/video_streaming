@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleDarkMode } from "../redux/themeSlice";
 import { signOut } from "firebase/auth";
 import { auth } from "../../utils/firebase";
+import { clearAuthData } from "../utils/auth";
 
 // Custom hook for handling outside clicks
 const useOutsideClick = (ref, callback) => {
@@ -49,7 +50,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      localStorage.clear();
+      clearAuthData();
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);

@@ -20,6 +20,7 @@ import {
   FaUpload
 } from 'react-icons/fa';
 import { authAPI } from '../services/api';
+import { clearAuthData } from '../utils/auth';
 
 // Import banner image
 import bannerImage from '../assets/banner.jpg';
@@ -702,8 +703,7 @@ function ProfilePage() {
   }, [navigate]);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearAuthData();
     navigate("/login");
   };
 
