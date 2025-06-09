@@ -1,23 +1,22 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { isAuthenticated, getCurrentUser } from '../utils/auth';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const location = useLocation();
+  const isAuth = isAuthenticated();
+  const user = getCurrentUser();
   
-  console.log('ProtectedRoute - User:', user);
-  console.log('ProtectedRoute - Allowed Roles:', allowedRoles);
-  
-  if (!user) {
-    console.log('ProtectedRoute - No user found, redirecting to login');
-    return <Navigate to="/login" replace />;
+  // If not authenticated, redirect to login with return path
+  if (!isAuth || !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // If user's role is not allowed, redirect to dashboard
   if (!allowedRoles.includes(user.userType)) {
-    console.log('ProtectedRoute - User not authorized, redirecting to dashboard');
     return <Navigate to="/home/dashboard" replace />;
   }
 
-  console.log('ProtectedRoute - User authorized, rendering children');
-  // If we're using a render prop pattern, we need to pass the userType
+  // If we're using a render prop pattern, pass the userType
   if (typeof children === 'function') {
     return children({ userType: user.userType });
   }

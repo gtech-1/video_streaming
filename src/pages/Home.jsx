@@ -1,12 +1,18 @@
-import React, { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import { isAuthenticated } from "../utils/auth";
 
 const Home = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+
+  // Check authentication
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prevState) => !prevState);

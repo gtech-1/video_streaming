@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import image1 from "../../imgs/4.png";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa"; 
@@ -11,9 +11,11 @@ import {
   GoogleAuthProvider, 
 } from "firebase/auth";
 import { authAPI } from "../../services/api";
+import { isAuthenticated } from "../../utils/auth";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -25,11 +27,12 @@ const Login = () => {
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/home");
+    if (isAuthenticated()) {
+      // If there's a return path, go there, otherwise go to home
+      const from = location.state?.from?.pathname || "/home";
+      navigate(from, { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, location]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -80,8 +83,9 @@ const Login = () => {
         localStorage.setItem("token", response.data.accessToken);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         
-        alert("Login successful!");
-        navigate("/home");
+        // If there's a return path, go there, otherwise go to home
+        const from = location.state?.from?.pathname || "/home";
+        navigate(from, { replace: true });
       }
     } catch (error) {
       const errorMessage = error.response?.data?.error || "Login failed. Please try again.";
