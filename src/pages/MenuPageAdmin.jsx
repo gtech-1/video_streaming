@@ -31,23 +31,25 @@ const MenuPageAdmin = () => {
   const [editingCourse, setEditingCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch courses on mount
   useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await courseAPI.getCourses();
+        setCourses(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch courses");
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchCourses();
   }, []);
 
-  const fetchCourses = async () => {
-    try {
-      setLoading(true);
-      const response = await courseAPI.getCourses();
-      setCourses(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch courses");
-      console.error("Error fetching courses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Update form when editing course changes
   useEffect(() => {
     if (editingCourse) {
       setNewName(editingCourse.courseName);
@@ -119,6 +121,7 @@ const MenuPageAdmin = () => {
     }
   };
 
+  // Render loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
@@ -127,6 +130,7 @@ const MenuPageAdmin = () => {
     );
   }
 
+  // Render main content
   return (
     <>
       <motion.div
@@ -187,7 +191,7 @@ const MenuPageAdmin = () => {
         </div>
       </motion.div>
 
-      {/* Modal for Adding/Editing Course */}
+      {/* Add/Edit Course Modal */}
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -199,14 +203,13 @@ const MenuPageAdmin = () => {
             onClick={() => {
               setShowModal(false);
               setEditingCourse(null);
+              setNewName("");
+              setNewImage(null);
             }}
           >
             <motion.div
               className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative"
               variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
@@ -214,30 +217,24 @@ const MenuPageAdmin = () => {
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label
-                    htmlFor="courseName"
-                    className="block text-gray-700 dark:text-gray-300 mb-1"
-                  >
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">
                     Course Name
                   </label>
                   <input
-                    id="courseName"
                     type="text"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Data Structures"
+                    placeholder="Enter course name"
+                    required
                   />
                 </div>
+
                 <div>
-                  <label
-                    htmlFor="courseImage"
-                    className="block text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    {editingCourse ? "Change Image" : "Upload Image"}
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1">
+                    {editingCourse ? "Change Course Image" : "Upload Course Image"}
                   </label>
                   <input
-                    id="courseImage"
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
@@ -252,7 +249,7 @@ const MenuPageAdmin = () => {
                     </span>
                     <img
                       src={editingCourse.courseImage}
-                      alt="Current"
+                      alt="Current Course"
                       className="w-full h-40 object-contain border border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
@@ -261,7 +258,7 @@ const MenuPageAdmin = () => {
                 {newImage && (
                   <div className="mt-2">
                     <span className="block text-gray-700 dark:text-gray-300 mb-1">
-                      Preview:
+                      Image Preview:
                     </span>
                     <img
                       src={URL.createObjectURL(newImage)}

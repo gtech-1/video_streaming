@@ -11,43 +11,25 @@ const CourseVideos = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
+  // Fetch videos when id changes
   useEffect(() => {
-    fetchVideos();
-  }, [id]);
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
+        const response = await videoAPI.getVideos(id);
+        setVideos(response.data);
+      } catch (error) {
+        toast.error("Failed to fetch videos");
+        console.error("Error fetching videos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchVideos = async () => {
-    try {
-      setLoading(true);
-      const response = await videoAPI.getVideos(id);
-      setVideos(response.data);
-    } catch (error) {
-      toast.error("Failed to fetch videos");
-      console.error("Error fetching videos:", error);
-    } finally {
-      setLoading(false);
+    if (id) {
+      fetchVideos();
     }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (!id || videos.length === 0) {
-    return (
-      <div className="text-center text-red-500 dark:text-red-400">
-        Error: Course not found or no videos available
-      </div>
-    );
-  }
-
-  const totalPages = Math.ceil(videos.length / videosPerPage);
-  const idxLast = currentPage * videosPerPage;
-  const idxFirst = idxLast - videosPerPage;
-  const currentVideos = videos.slice(idxFirst, idxLast);
+  }, [id]);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -60,6 +42,31 @@ const CourseVideos = () => {
     }
   };
 
+  // Calculate pagination values
+  const totalPages = Math.ceil(videos.length / videosPerPage);
+  const idxLast = currentPage * videosPerPage;
+  const idxFirst = idxLast - videosPerPage;
+  const currentVideos = videos.slice(idxFirst, idxLast);
+
+  // Render loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // Render error state
+  if (!id || videos.length === 0) {
+    return (
+      <div className="text-center text-red-500 dark:text-red-400">
+        Error: Course not found or no videos available
+      </div>
+    );
+  }
+
+  // Render main content
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">

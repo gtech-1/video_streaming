@@ -50,6 +50,7 @@ const UserListAdmin = () => {
   const [members, setMembers] = useState([]);
   const [admins, setAdmins] = useState([]);
   const [userType, setUserType] = useState("members");
+  const [loading, setLoading] = useState(true);
 
   // Filters & pagination
   const [showFilters, setShowFilters] = useState(false);
@@ -105,6 +106,7 @@ const UserListAdmin = () => {
   useEffect(() => {
     async function load() {
       try {
+        setLoading(true);
         const res = await userAPI.getUsers();
         const all = res.data.map(user => ({
           id: user._id,
@@ -128,6 +130,8 @@ const UserListAdmin = () => {
           err.response?.data?.error ||
             "Failed to load users. Please check your connection and try again."
         );
+      } finally {
+        setLoading(false);
       }
     }
     load();
@@ -201,78 +205,45 @@ const UserListAdmin = () => {
   );
 
   // 3) Edit user → PUT
-  const handleEditSubmit = useCallback(
-    async (e) => {
-      e.preventDefault();
-      const form = e.target;
-      const body = {
-        firstName: form.firstName.value,
-        lastName: form.lastName.value,
-        email: form.email.value,
-        phone: form.mobile.value,
-        photoUrl: form.photo.value,
-        status: form.status.value,
-        userType: form.userType.value,
+  const handleEditUser = useCallback(async (userId, updatedData) => {
+    try {
+      const res = await userAPI.updateUser(userId, updatedData);
+      const updated = {
+        id: res.data._id,
+        name: `${res.data.firstName} ${res.data.lastName}`,
+        email: res.data.email,
+        mobile: res.data.mobile,
+        photo: res.data.photo,
+        status: res.data.status,
+        userType: res.data.userType
       };
 
-      try {
-        const res = await userAPI.updateUser(selectedUser.id, body);
-        const updated = {
-          id: res.data._id,
-          name: `${res.data.firstName} ${res.data.lastName}`,
-          email: res.data.email,
-          mobile: res.data.mobile,
-          photo: res.data.photo,
-          status: res.data.status,
-          userType: res.data.userType,
-        };
-
-        if (updated.userType === "members") {
-          setMembers((m) =>
-            m
-              .filter((u) => u.id !== updated.id)
-              .concat(updated)
-          );
-          setAdmins((a) =>
-            a.filter((u) => u.id !== updated.id)
-          );
-        } else {
-          setAdmins((a) =>
-            a
-              .filter((u) => u.id !== updated.id)
-              .concat(updated)
-          );
-          setMembers((m) =>
-            m.filter((u) => u.id !== updated.id)
-          );
-        }
-        toast.success("User updated successfully");
-      } catch (err) {
-        console.error(err);
-        toast.error(
-          err.response?.data?.error ||
-            "Failed to update user"
-        );
-      } finally {
-        setShowEditModal(false);
-        setSelectedUser(null);
+      if (updated.userType === "members") {
+        setMembers((prev) => prev.map(u => u.id === userId ? updated : u));
+      } else {
+        setAdmins((prev) => prev.map(u => u.id === userId ? updated : u));
       }
-    },
-    [selectedUser]
-  );
+      toast.success("User updated successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to update user");
+    } finally {
+      setShowEditModal(false);
+    }
+  }, []);
 
   // 4) Delete user → DELETE
   const handleDeleteUser = useCallback(
-    async () => {
+    async (userId) => {
       try {
-        await userAPI.deleteUser(selectedUser.id);
-        if (selectedUser.userType === "members") {
+        await userAPI.deleteUser(userId);
+        if (userType === "members") {
           setMembers((m) =>
-            m.filter((u) => u.id !== selectedUser.id)
+            m.filter((u) => u.id !== userId)
           );
         } else {
           setAdmins((a) =>
-            a.filter((u) => u.id !== selectedUser.id)
+            a.filter((u) => u.id !== userId)
           );
         }
         toast.success("User deleted successfully");
@@ -284,10 +255,9 @@ const UserListAdmin = () => {
         );
       } finally {
         setShowDeleteModal(false);
-        setSelectedUser(null);
       }
     },
-    [selectedUser]
+    [userType]
   );
 
   const handleFilterStatus = (status) => {
@@ -299,72 +269,70 @@ const UserListAdmin = () => {
   // Export users to CSV
   const handleExportUsers = async () => {
     try {
-      const response = await userAPI.exportUsers();
-      const users = response.data;
-      
-      // Convert to CSV
-      const csv = Papa.unparse(users);
-      
-      // Create and download file
+      const csv = Papa.unparse(currentData);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `users_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
+      link.href = URL.createObjectURL(blob);
+      link.download = `${userType}_list.csv`;
       link.click();
-      document.body.removeChild(link);
-      
-      toast.success('Users exported successfully');
-    } catch (error) {
-      console.error('Export error:', error);
-      toast.error(error.response?.data?.message || 'Failed to export users');
+      toast.success("Users exported successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to export users");
     }
   };
 
   // Import users from CSV
-  const handleImportUsers = async (event) => {
+  const handleImportUsers = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    Papa.parse(file, {
-      complete: async (results) => {
-        try {
-          const response = await userAPI.importUsers(results.data);
-          
-          if (response.data.errors.length > 0) {
-            toast.error(`${response.data.errors.length} users failed to import`);
+    try {
+      Papa.parse(file, {
+        complete: async (results) => {
+          const users = results.data.slice(1); // Skip header row
+          for (const user of users) {
+            await userAPI.createUser({
+              firstName: user[0],
+              lastName: user[1],
+              email: user[2],
+              mobile: user[3],
+              userType: userType
+            });
           }
-          
-          if (response.data.results.length > 0) {
-            toast.success(`${response.data.results.length} users imported successfully`);
-            // Refresh the user list
-            const res = await userAPI.getUsers();
-            const all = res.data.map(user => ({
-              id: user._id,
-              name: `${user.firstName} ${user.lastName}`,
-              email: user.email,
-              mobile: user.mobile,
-              photo: user.photo,
-              status: user.status,
-              userType: user.userType
-            }));
-            setMembers(all.filter((u) => u.userType === "members"));
-            setAdmins(all.filter((u) => u.userType === "admins"));
-          }
-        } catch (error) {
-          console.error('Import error:', error);
-          toast.error(error.response?.data?.message || 'Failed to import users');
+          toast.success("Users imported successfully");
+          // Refresh the list
+          const res = await userAPI.getUsers();
+          const all = res.data.map(user => ({
+            id: user._id,
+            name: `${user.firstName} ${user.lastName}`,
+            email: user.email,
+            mobile: user.mobile,
+            photo: user.photo,
+            status: user.status,
+            userType: user.userType
+          }));
+          setMembers(all.filter((u) => u.userType === "members"));
+          setAdmins(all.filter((u) => u.userType === "admins"));
+        },
+        error: (error) => {
+          console.error(error);
+          toast.error("Failed to parse CSV file");
         }
-      },
-      header: true,
-      error: (error) => {
-        console.error('CSV parsing error:', error);
-        toast.error('Failed to parse CSV file');
-      }
-    });
-  };
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to import users");
+    }
+  }, [userType]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -834,7 +802,16 @@ const UserListAdmin = () => {
                   Edit User
                 </h2>
               </div>
-              <form onSubmit={handleEditSubmit} className="p-4 space-y-3">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.target;
+                handleEditUser(selectedUser.id, {
+                  firstName: form.firstName.value,
+                  lastName: form.lastName.value,
+                  email: form.email.value,
+                  mobile: form.mobile.value,
+                });
+              }} className="p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -881,44 +858,6 @@ const UserListAdmin = () => {
                     required
                     className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                   />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Photo URL
-                  </label>
-                  <input
-                    name="photo"
-                    defaultValue={selectedUser.photo}
-                    className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      defaultValue={selectedUser.status}
-                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      User Type
-                    </label>
-                    <select
-                      name="userType"
-                      defaultValue={selectedUser.userType}
-                      className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    >
-                      <option value="members">Member</option>
-                      <option value="admins">Admin</option>
-                    </select>
-                  </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <button
@@ -979,7 +918,7 @@ const UserListAdmin = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleDeleteUser}
+                    onClick={() => handleDeleteUser(selectedUser.id)}
                     className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                   >
                     Delete User
