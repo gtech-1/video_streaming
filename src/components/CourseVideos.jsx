@@ -1,29 +1,53 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-// Direct import of your JSON file
-import courseData from "./courseVideosData.json";
+import { videoAPI } from "../services/api";
+import { toast } from "react-toastify";
 
 const CourseVideos = () => {
-  const { id } = useParams();        // course key (e.g. "python", "java", etc.)
+  const { id } = useParams(); // course ID
   const videosPerPage = 9;
 
+  const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // Get the array for this course ID
-  const filteredVideos = courseData[id] || [];
+  useEffect(() => {
+    fetchVideos();
+  }, [id]);
 
-  if (!id || filteredVideos.length === 0) {
+  const fetchVideos = async () => {
+    try {
+      setLoading(true);
+      const response = await videoAPI.getVideos(id);
+      setVideos(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch videos");
+      console.error("Error fetching videos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="text-center text-red-500 dark:text-red-400">
-        Error: Course not found
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+  if (!id || videos.length === 0) {
+    return (
+      <div className="text-center text-red-500 dark:text-red-400">
+        Error: Course not found or no videos available
+      </div>
+    );
+  }
+
+  const totalPages = Math.ceil(videos.length / videosPerPage);
   const idxLast = currentPage * videosPerPage;
   const idxFirst = idxLast - videosPerPage;
-  const currentVideos = filteredVideos.slice(idxFirst, idxLast);
+  const currentVideos = videos.slice(idxFirst, idxLast);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -39,25 +63,24 @@ const CourseVideos = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-        {id.toUpperCase()} Course Videos
+        Course Videos
       </h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {currentVideos.map((video) => (
           <div
-            key={video.id}
+            key={video._id}
             className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
           >
-            <iframe
-              className="w-full h-48"
-              src={video.url}
-              title={video.title}
-              frameBorder="0"
-              allowFullScreen
+            <video
+              className="w-full h-48 object-cover bg-black"
+              src={video.videoUrl}
+              poster={video.thumbnailUrl}
+              controls
             />
             <div className="p-4 text-center">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {video.title}
+                {video.videoTitle}
               </h2>
             </div>
           </div>
@@ -70,37 +93,19 @@ const CourseVideos = () => {
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 border rounded ${
-              currentPage === 1
-                ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-            }`}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded disabled:opacity-50"
           >
-            Prev
+            Previous
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i + 1}
-              onClick={() => handlePageChange(i + 1)}
-              className={`mx-1 px-3 py-1 border rounded ${
-                currentPage === i + 1
-                  ? "bg-blue-500 dark:bg-blue-600 text-white"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
+          <span className="text-gray-700 dark:text-gray-300">
+            Page {currentPage} of {totalPages}
+          </span>
 
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 border rounded ${
-              currentPage === totalPages
-                ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-            }`}
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded disabled:opacity-50"
           >
             Next
           </button>
