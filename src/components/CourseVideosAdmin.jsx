@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
 import { BiEdit, BiTrash } from "react-icons/bi";
-import courseData from "./courseVideosData.json"; // Structure: { [courseId]: [ { id, title, url } ] }
+import { videoAPI } from "../services/api";
+import { toast } from "react-toastify";
 
 const pageVariants = {
   hidden: { opacity: 0, y: 10 },
@@ -28,28 +28,42 @@ const modalVariants = {
 };
 
 const CourseVideosAdmin = () => {
-  const { id } = useParams(); // course key
+  const { id } = useParams(); // course ID
   const videosPerPage = 9;
 
-  // Initialize video list from JSON (clone array)
-  const initialList = courseData[id] ? [...courseData[id]] : [];
-  const [videos, setVideos] = useState(initialList);
-
+  const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingVideo, setEditingVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Form fields
   const [newTitle, setNewTitle] = useState("");
-  const [newUrl, setNewUrl] = useState(""); // For URL input or blob URL
-  const [newFile, setNewFile] = useState(null); // File object if uploaded
-  const [insertAfterId, setInsertAfterId] = useState(""); // ID of video after which to insert
+  const [newVideo, setNewVideo] = useState(null);
+  const [newThumbnail, setNewThumbnail] = useState(null);
 
   // Pagination calculations
   const totalPages = Math.ceil(videos.length / videosPerPage);
   const idxLast = currentPage * videosPerPage;
   const idxFirst = idxLast - videosPerPage;
   const currentVideos = videos.slice(idxFirst, idxLast);
+
+  useEffect(() => {
+    fetchVideos();
+  }, [id]);
+
+  const fetchVideos = async () => {
+    try {
+      setLoading(true);
+      const response = await videoAPI.getVideos(id);
+      setVideos(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch videos");
+      console.error("Error fetching videos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Scroll to top on page change
   useEffect(() => {
@@ -74,91 +88,77 @@ const CourseVideosAdmin = () => {
   const openAddModal = () => {
     setEditingVideo(null);
     setNewTitle("");
-    setNewUrl("");
-    setNewFile(null);
-    setInsertAfterId(""); // default to top
+    setNewVideo(null);
+    setNewThumbnail(null);
     setShowModal(true);
   };
 
   const openEditModal = (video) => {
     setEditingVideo(video);
-    setNewTitle(video.title);
-    setNewUrl(video.url);
-    setNewFile(null);
+    setNewTitle(video.videoTitle);
+    setNewVideo(null);
+    setNewThumbnail(null);
     setShowModal(true);
   };
 
-  const handleDelete = (videoId) => {
-    setVideos((prev) => prev.filter((v) => v.id !== videoId));
+  const handleDelete = async (videoId) => {
+    try {
+      await videoAPI.deleteVideo(videoId);
+      setVideos((prev) => prev.filter((v) => v._id !== videoId));
+      toast.success("Video deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete video");
+      console.error("Error deleting video:", error);
+    }
   };
 
-  const handleFileChange = (e) => {
+  const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    // Create a blob URL for preview/playback
-    const blobUrl = URL.createObjectURL(file);
-    setNewFile(file);
-    setNewUrl(blobUrl);
+    setNewVideo(file);
   };
 
-  const toYouTubeEmbed = (rawUrl) => {
-    // Matches "youtube.com/watch?v=VIDEO_ID" or "youtu.be/VIDEO_ID"
-    const match = rawUrl.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([A-Za-z0-9_\-]+)/
-    );
-    if (match) {
-      return `https://www.youtube.com/embed/${match[1]}`;
-    }
-    return null;
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setNewThumbnail(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newTitle.trim() || (!newUrl.trim() && !newFile)) return;
+    if (!newTitle.trim() || (!newVideo && !editingVideo)) return;
 
-    if (editingVideo) {
-      // Update existing video (retain position)
-      setVideos((prev) =>
-        prev.map((v) =>
-          v.id === editingVideo.id
-            ? { ...v, title: newTitle.trim(), url: newUrl.trim() }
-            : v
-        )
-      );
-    } else {
-      // Add new video at specified position
-      const newVideo = {
-        id: uuidv4(),
-        title: newTitle.trim(),
-        url: newUrl.trim(), // blob URL or external URL
-      };
+    try {
+      const formData = new FormData();
+      formData.append("videoTitle", newTitle.trim());
+      if (newVideo) {
+        formData.append("video", newVideo);
+      }
+      if (newThumbnail) {
+        formData.append("thumbnail", newThumbnail);
+      }
 
-      setVideos((prev) => {
-        if (!insertAfterId) {
-          // Insert at beginning
-          return [newVideo, ...prev];
-        }
-        // Find index of the video after which to insert
-        const idx = prev.findIndex((v) => v.id === insertAfterId);
-        if (idx === -1) {
-          // Fallback: prepend
-          return [newVideo, ...prev];
-        }
-        // Insert after idx
-        const updated = [...prev];
-        updated.splice(idx + 1, 0, newVideo);
-        return updated;
-      });
-      setCurrentPage(1);
+      if (editingVideo) {
+        const response = await videoAPI.updateVideo(editingVideo._id, formData);
+        setVideos((prev) =>
+          prev.map((v) => (v._id === editingVideo._id ? response.data : v))
+        );
+        toast.success("Video updated successfully");
+      } else {
+        const response = await videoAPI.createVideo(id, formData);
+        setVideos((prev) => [response.data, ...prev]);
+        toast.success("Video created successfully");
+      }
+
+      setEditingVideo(null);
+      setNewTitle("");
+      setNewVideo(null);
+      setNewThumbnail(null);
+      setShowModal(false);
+    } catch (error) {
+      toast.error(editingVideo ? "Failed to update video" : "Failed to create video");
+      console.error("Error saving video:", error);
     }
-
-    // Cleanup
-    setEditingVideo(null);
-    setNewTitle("");
-    setNewUrl("");
-    setNewFile(null);
-    setInsertAfterId("");
-    setShowModal(false);
   };
 
   const handlePageChange = (newPage) => {
@@ -166,6 +166,14 @@ const CourseVideosAdmin = () => {
       setCurrentPage(newPage);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -177,7 +185,7 @@ const CourseVideosAdmin = () => {
       >
         <div className="flex justify-between items-center max-w-6xl mx-auto mb-6">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {id.toUpperCase()} Videos (Admin)
+            Course Videos (Admin)
           </h1>
           <button
             onClick={openAddModal}
@@ -194,52 +202,39 @@ const CourseVideosAdmin = () => {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {currentVideos.map((video) => {
-            const embedUrl = toYouTubeEmbed(video.url);
-            return (
-              <div key={video.id} className="relative group">
-                <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-                  {embedUrl ? (
-                    <iframe
-                      className="w-full h-48"
-                      src={embedUrl}
-                      title={video.title}
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      className="w-full h-48 object-cover bg-black"
-                      src={video.url}
-                      controls
-                    />
-                  )}
-                  <div className="p-4 text-center">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {video.title}
-                    </h2>
-                  </div>
-                </div>
-
-                {/* Edit & Delete buttons: always visible on mobile, hover-only on larger screens */}
-                <div className="absolute top-2 right-2 flex space-x-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => openEditModal(video)}
-                    className="p-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-                  >
-                    <BiEdit size={20} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(video.id)}
-                    className="p-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
-                  >
-                    <BiTrash size={20} />
-                  </button>
+          {currentVideos.map((video) => (
+            <div key={video._id} className="relative group">
+              <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+                <video
+                  className="w-full h-48 object-cover bg-black"
+                  src={video.videoUrl}
+                  poster={video.thumbnailUrl}
+                  controls
+                />
+                <div className="p-4 text-center">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {video.videoTitle}
+                  </h2>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Edit & Delete buttons */}
+              <div className="absolute top-2 right-2 flex space-x-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                <button
+                  onClick={() => openEditModal(video)}
+                  className="p-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                >
+                  <BiEdit size={20} />
+                </button>
+                <button
+                  onClick={() => handleDelete(video._id)}
+                  className="p-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition"
+                >
+                  <BiTrash size={20} />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Pagination */}
@@ -248,37 +243,17 @@ const CourseVideosAdmin = () => {
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`px-3 py-1 border rounded ${
-                currentPage === 1
-                  ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                  : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-              }`}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded disabled:opacity-50"
             >
-              Prev
+              Previous
             </button>
-
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => handlePageChange(i + 1)}
-                className={`mx-1 px-3 py-1 border rounded ${
-                  currentPage === i + 1
-                    ? "bg-blue-500 dark:bg-blue-600 text-white"
-                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                }`}
-              >
-                {i + 1}
-              </button>
-            ))}
-
+            <span className="text-gray-700 dark:text-gray-300">
+              Page {currentPage} of {totalPages}
+            </span>
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 border rounded ${
-                currentPage === totalPages
-                  ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                  : "bg-blue-500 dark:bg-blue-600 text-white hover:bg-blue-600 dark:hover:bg-blue-700"
-              }`}
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded disabled:opacity-50"
             >
               Next
             </button>
@@ -286,7 +261,7 @@ const CourseVideosAdmin = () => {
         )}
       </motion.div>
 
-      {/* Modal for Add/Edit Video */}
+      {/* Modal for Adding/Editing Video */}
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -298,14 +273,10 @@ const CourseVideosAdmin = () => {
             onClick={() => {
               setShowModal(false);
               setEditingVideo(null);
-              setNewTitle("");
-              setNewUrl("");
-              setNewFile(null);
-              setInsertAfterId("");
             }}
           >
             <motion.div
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative"
+              className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-11/12 max-w-md p-6 relative"
               variants={modalVariants}
               initial="hidden"
               animate="visible"
@@ -329,79 +300,65 @@ const CourseVideosAdmin = () => {
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., Introduction to Algorithms"
+                    placeholder="Enter video title"
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="videoUrl"
-                    className="block text-gray-700 dark:text-gray-300 mb-1"
-                  >
-                    Video URL (optional if uploading a file)
-                  </label>
-                  <input
-                    id="videoUrl"
-                    type="text"
-                    value={newUrl.startsWith("blob:") ? "" : newUrl}
-                    onChange={(e) => {
-                      setNewFile(null);
-                      setNewUrl(e.target.value);
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g., https://example.com/video.mp4 or YouTube watch link"
-                  />
-                </div>
+
                 <div>
                   <label
                     htmlFor="videoFile"
                     className="block text-gray-700 dark:text-gray-300 mb-1"
                   >
-                    Upload Video File (optional)
+                    {editingVideo ? "Change Video" : "Upload Video"}
                   </label>
                   <input
                     id="videoFile"
                     type="file"
                     accept="video/*"
-                    onChange={handleFileChange}
+                    onChange={handleVideoChange}
                     className="w-full text-gray-900 dark:text-gray-100"
                   />
                 </div>
 
-                {newUrl && (
+                <div>
+                  <label
+                    htmlFor="thumbnailFile"
+                    className="block text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    {editingVideo ? "Change Thumbnail" : "Upload Thumbnail"}
+                  </label>
+                  <input
+                    id="thumbnailFile"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    className="w-full text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+
+                {editingVideo && !newThumbnail && (
                   <div className="mt-2">
                     <span className="block text-gray-700 dark:text-gray-300 mb-1">
-                      Preview:
+                      Current Thumbnail:
                     </span>
-                    <video
-                      src={newUrl}
-                      controls
+                    <img
+                      src={editingVideo.thumbnailUrl}
+                      alt="Current Thumbnail"
                       className="w-full h-40 object-contain border border-gray-300 dark:border-gray-600 rounded"
                     />
                   </div>
                 )}
 
-                {/* Insert After selector only when adding new */}
-                {!editingVideo && videos.length > 0 && (
-                  <div>
-                    <label
-                      htmlFor="insertAfter"
-                      className="block text-gray-700 dark:text-gray-300 mb-1"
-                    >
-                      Insert After
-                    </label>
-                    <select
-                      id="insertAfter"
-                      value={insertAfterId}
-                      onChange={(e) => setInsertAfterId(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">At Top (First)</option>
-                      {videos.map((v) => (
-                        <option key={v.id} value={v.id}>
-                          After: {v.title}
-                        </option>
-                      ))}
-                    </select>
+                {newThumbnail && (
+                  <div className="mt-2">
+                    <span className="block text-gray-700 dark:text-gray-300 mb-1">
+                      Thumbnail Preview:
+                    </span>
+                    <img
+                      src={URL.createObjectURL(newThumbnail)}
+                      alt="Thumbnail Preview"
+                      className="w-full h-40 object-contain border border-gray-300 dark:border-gray-600 rounded"
+                    />
                   </div>
                 )}
 
@@ -412,9 +369,8 @@ const CourseVideosAdmin = () => {
                       setShowModal(false);
                       setEditingVideo(null);
                       setNewTitle("");
-                      setNewUrl("");
-                      setNewFile(null);
-                      setInsertAfterId("");
+                      setNewVideo(null);
+                      setNewThumbnail(null);
                     }}
                     className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition"
                   >

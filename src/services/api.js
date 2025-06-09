@@ -54,4 +54,54 @@ export const userAPI = {
     importUsers: (data) => api.post('/users/import', data)
 };
 
+export const courseAPI = {
+    getCourses: () => api.get('/courses'),
+    createCourse: (data) => {
+        if (data instanceof FormData) {
+            return api.post('/courses', data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
+        return api.post('/courses', data);
+    },
+    updateCourse: (courseId, data) => {
+        if (data instanceof FormData) {
+            return api.put(`/courses/${courseId}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
+        return api.put(`/courses/${courseId}`, data);
+    },
+    deleteCourse: (courseId) => api.delete(`/courses/${courseId}`)
+};
+
+export const videoAPI = {
+    getVideos: (courseId) => api.get(`/videos/course/${courseId}`),
+    createVideo: (courseId, data) => {
+        if (data instanceof FormData) {
+            return api.post(`/videos/course/${courseId}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
+        return api.post(`/videos/course/${courseId}`, data);
+    },
+    updateVideo: (videoId, data) => {
+        if (data instanceof FormData) {
+            return api.put(`/videos/${videoId}`, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+        }
+        return api.put(`/videos/${videoId}`, data);
+    },
+    deleteVideo: (videoId) => api.delete(`/videos/${videoId}`)
+};
+
 export default api; 
