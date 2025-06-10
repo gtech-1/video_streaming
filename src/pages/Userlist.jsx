@@ -49,7 +49,7 @@ const UserList = () => {
   useEffect(() => {
     async function loadMembers() {
       try {
-        const res = await userAPI.getUsers();
+        const res = await userAPI.getMembers();
         const all = res.data.map(user => ({
           id: user._id,
           name: `${user.firstName} ${user.lastName}`,
@@ -59,9 +59,10 @@ const UserList = () => {
           status: user.status,
           userType: user.userType
         }));
-        setMembers(all.filter((u) => u.userType === "members"));
+        setMembers(all);
       } catch (err) {
         console.error("Failed to load members:", err);
+        toast.error("Failed to load members");
       }
     }
     loadMembers();
