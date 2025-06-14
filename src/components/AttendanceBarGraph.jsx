@@ -12,20 +12,19 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const AttendanceBarGraph = () => {
-  const subjects = ["Math", "Physics", "Chemistry", "CS", "English"];
-  const attendanceData = [78, 85, 72, 80, 65];
+const AttendanceBarGraph = ({ data }) => {
+  if (!data) return null;
 
-  const data = {
-    labels: subjects,
+  const chartData = {
+    labels: data.labels,
     datasets: [
       {
         label: "Attendance (%)",
-        data: attendanceData,
-        backgroundColor: attendanceData.map((value) =>
+        data: data.values,
+        backgroundColor: data.values.map((value) =>
           value < 75 ? "rgba(255, 99, 132, 0.7)" : "rgba(54, 162, 235, 0.7)"
         ),
-        borderColor: attendanceData.map((value) =>
+        borderColor: data.values.map((value) =>
           value < 75 ? "rgba(255, 99, 132, 1)" : "rgba(54, 162, 235, 1)"
         ),
         borderWidth: 1,
@@ -74,7 +73,7 @@ const AttendanceBarGraph = () => {
         📊 Subject-wise Attendance
       </h2>
       <div className="h-48 sm:h-64">
-        <Bar data={data} options={options} />
+        <Bar data={chartData} options={options} />
       </div>
     </div>
   );

@@ -10,10 +10,13 @@ import {
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const CreditsDoughnutChart = ({ earnedCredits = 130, totalCredits = 180, size = 200 }) => {
+const CreditsDoughnutChart = ({ data }) => {
+  if (!data) return null;
+  
+  const { earnedCredits, totalCredits, size = 200 } = data;
   const remainingCredits = totalCredits - earnedCredits;
 
-  const data = {
+  const chartData = {
     labels: ["Earned Credits", "Remaining Credits"],
     datasets: [
       {
@@ -48,7 +51,7 @@ const CreditsDoughnutChart = ({ earnedCredits = 130, totalCredits = 180, size = 
         className="relative flex items-center justify-center"
         style={{ width: `${size}px`, height: `${size}px` }}
       >
-        <Doughnut data={data} options={options} />
+        <Doughnut data={chartData} options={options} />
         <div className="absolute flex items-center justify-center text-2xl font-bold text-gray-700 dark:text-white">
           {earnedCredits} / {totalCredits}
         </div>

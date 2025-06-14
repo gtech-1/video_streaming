@@ -8,6 +8,9 @@ const api = axios.create({
 // Add token to requests
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
+    console.log('Making API request to:', config.url);
+    console.log('With token:', token ? 'Token present' : 'No token');
+    
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -16,8 +19,17 @@ api.interceptors.request.use((config) => {
 
 // Handle token expiration
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        console.log('API Response received:', response.config.url, response.status);
+        return response;
+    },
     (error) => {
+        console.error('API Error:', {
+            url: error.config?.url,
+            status: error.response?.status,
+            data: error.response?.data
+        });
+        
         if (error.response?.status === 401) {
             // Handle token expiration
             clearAuthData();
@@ -103,6 +115,10 @@ export const videoAPI = {
         return api.put(`/videos/${videoId}`, data);
     },
     deleteVideo: (videoId) => api.delete(`/videos/${videoId}`)
+};
+
+export const dashboardAPI = {
+    getDashboardData: () => api.get('/member-dashboard')
 };
 
 export default api; 

@@ -1,13 +1,8 @@
 import React from "react";
 
-const topStudents = [
-  { id: 1, name: "John Doe", department: "CSE", sgpa: 9.8 },
-  { id: 2, name: "Alice Smith", department: "ECE", sgpa: 9.5 },
-  { id: 3, name: "Michael ", department: "MECH", sgpa: 9.3 },
-  { id: 3, name: "Michael ", department: "MECH", sgpa: 9.3 },
-];
+const TopStudents = ({ data }) => {
+  if (!data) return null;
 
-const TopStudents = () => {
   return (
     <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-lg transition-colors duration-300">
       {/* Header */}
@@ -26,9 +21,9 @@ const TopStudents = () => {
             </tr>
           </thead>
           <tbody>
-            {topStudents.map((student, index) => (
+            {data.map((student, index) => (
               <tr
-                key={student.id}
+                key={student._id}
                 className="border-b border-gray-200 dark:border-gray-700 text-sm sm:text-base"
               >
                 <td className="p-2 sm:p-3 font-bold text-gray-700 dark:text-white">

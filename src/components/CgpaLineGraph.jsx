@@ -12,16 +12,15 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
 
-const CgpaLineGraph = () => {
-  const semesters = ["Sem 1", "Sem 2", "Sem 3", "Sem 4", "Sem 5", "Sem 6"];
-  const cgpaData = [9.0, 7.8, 8.3, 9.0, 8.1, 8.5];
+const CgpaLineGraph = ({ data }) => {
+  if (!data) return null;
 
-  const data = {
-    labels: semesters,
+  const chartData = {
+    labels: data.labels,
     datasets: [
       {
         label: "CGPA",
-        data: cgpaData,
+        data: data.values,
         borderColor: "#4F46E5", // Indigo
         backgroundColor: "rgba(79, 70, 229, 0.2)",
         pointBackgroundColor: "#4F46E5",
@@ -72,7 +71,7 @@ const CgpaLineGraph = () => {
         📈 CGPA Over Semesters
       </h2>
       <div className="h-48 sm:h-64">
-        <Line data={data} options={options} />
+        <Line data={chartData} options={options} />
       </div>
     </div>
   );

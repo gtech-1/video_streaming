@@ -14,19 +14,21 @@ import { useSelector } from "react-redux";
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip);
 
-const StatisticsChart = () => {
+const StatisticsChart = ({ data }) => {
   const chartRef = useRef(null);
-  const darkMode = useSelector((state) => state.theme.darkMode); // Detect dark mode
+  const darkMode = useSelector((state) => state.theme.darkMode);
 
-  const data = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  if (!data) return null;
+
+  const chartData = {
+    labels: data.labels,
     datasets: [
       {
-        label: "Hours Spent",
-        data: [2, 4, 9, 3, 5, 2, 4],
+        label: data.title,
+        data: data.values,
         fill: true,
         borderColor: "#3B82F6",
-        backgroundColor: "rgba(59, 130, 246, 0.3)", // default; will override below
+        backgroundColor: "rgba(59, 130, 246, 0.3)",
         tension: 0.4,
         pointBackgroundColor: "#3B82F6",
         pointBorderColor: "#fff",
@@ -41,7 +43,7 @@ const StatisticsChart = () => {
     scales: {
       x: {
         ticks: {
-          color: darkMode ? "#D1D5DB" : "#6B7280", // light gray in dark, gray-500 in light
+          color: darkMode ? "#D1D5DB" : "#6B7280",
           font: { size: 10 },
         },
         grid: {
@@ -71,7 +73,7 @@ const StatisticsChart = () => {
 
       if (darkMode) {
         gradient.addColorStop(0, "rgba(59, 130, 246, 0.5)");
-        gradient.addColorStop(1, "rgba(30, 41, 59, 0.0)"); // darker stop
+        gradient.addColorStop(1, "rgba(30, 41, 59, 0.0)");
       } else {
         gradient.addColorStop(0, "rgba(59, 130, 246, 0.6)");
         gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
@@ -85,13 +87,10 @@ const StatisticsChart = () => {
   return (
     <div className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-xs sm:max-w-md transition-colors duration-300">
       <h2 className="text-gray-800 dark:text-white text-base sm:text-lg font-semibold">
-        Statistics
+        {data.title}
       </h2>
-      <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">
-        Hours Spent Last Week
-      </p>
       <div className="h-40 sm:h-48">
-        <Line ref={chartRef} data={data} options={options} />
+        <Line ref={chartRef} data={chartData} options={options} />
       </div>
     </div>
   );
