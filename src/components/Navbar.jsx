@@ -50,7 +50,7 @@ const Navbar = ({ toggleSidebar, isSidebarOpen }) => {
     try {
       await signOut(auth);
       localStorage.clear();
-      navigate("/");
+      navigate("/signUp");
     } catch (error) {
       console.error("Logout failed:", error);
     }

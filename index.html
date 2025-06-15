@@ -8,6 +8,21 @@
     <title>Loop</title>
   </head>
   <body>
+    <script type="module">
+    import Chatbot from "https://cdn.jsdelivr.net/npm/thub-embed@9.3.9/dist/web.js"
+    Chatbot.init({
+        chatflowid: "4e311f1a-abae-466f-953f-76b996d58ba7",
+        apiHost: "https://demo.thub.tech",
+        theme:{
+             button: {
+                backgroundColor: "#1F2937"
+             },
+              userMessage:{
+                backgroundColor:"#f7f8ff"
+              }
+        }
+    })
+</script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

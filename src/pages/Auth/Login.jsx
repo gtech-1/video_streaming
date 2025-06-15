@@ -3,13 +3,10 @@ import image1 from "../../imgs/4.png";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FaGithub } from "react-icons/fa"; 
-import { GithubAuthProvider, signInWithPopup } from 'firebase/auth';
+import { FaGithub } from "react-icons/fa";
+import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../../../utils/firebase";
-import {
-  getAuth,
-  GoogleAuthProvider, 
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { authAPI } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
@@ -17,13 +14,13 @@ const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState("");
-    const { setUser } = useAuth(); 
+  const { setUser } = useAuth();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -33,7 +30,7 @@ const Login = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     // Required fields validation
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
@@ -50,15 +47,15 @@ const Login = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ""
+        [name]: "",
       }));
     }
   };
@@ -66,7 +63,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setApiError("");
-    
+
     if (!validateForm()) {
       return;
     }
@@ -74,20 +71,21 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await authAPI.login(formData);
-      
+
       if (response.status === 200) {
         // Store the JWT token and user data
         localStorage.setItem("token", response.data.accessToken);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-        const userData=JSON.stringify(response.data.user);
-        console.log(userData)
+        const userData = response.data.user;
+        console.log(userData, "User data from login");
         setUser(userData);
+
         alert("Login successful!");
         navigate("/home");
-        location.reload()
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Login failed. Please try again.";
+      const errorMessage =
+        error.response?.data?.error || "Login failed. Please try again.";
       setApiError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -95,7 +93,7 @@ const Login = () => {
   };
 
   const googleProvider = new GoogleAuthProvider();
-  
+
   const GoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
@@ -108,7 +106,7 @@ const Login = () => {
 
   const GitHubProvider = async () => {
     try {
-      const provider = new GithubAuthProvider(); 
+      const provider = new GithubAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const credential = GithubAuthProvider.credentialFromResult(result);
       const token = credential.accessToken;
@@ -123,11 +121,12 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center h-screen w-screen p-4">
       <div className="flex flex-col md:flex-row items-center justify-center bg-[#2d2638] p-6 h-auto md:h-[630px] w-full max-w-[950px] rounded-lg relative">
-        
         <div className="bg-transparent p-6 text-white rounded-lg w-full max-w-[400px] h-full flex flex-col items-center justify-center">
           <div className="w-full mb-3">
             <p className="text-3xl text-center mb-10 font-bold">Login</p>
-            <p className="text-lg mt-2 text-center md:text-left">Welcome back,</p>
+            <p className="text-lg mt-2 text-center md:text-left">
+              Welcome back,
+            </p>
           </div>
 
           {apiError && (
@@ -136,7 +135,10 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="flex flex-col w-full items-center">
+          <form
+            onSubmit={handleLogin}
+            className="flex flex-col w-full items-center"
+          >
             <div className="w-full">
               <input
                 type="email"
@@ -155,7 +157,7 @@ const Login = () => {
 
             <div className="relative mt-4 w-full">
               <input
-                type={showPassword ? "text" : "password"} 
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="********"
                 className={`p-2 rounded-md outline-none text-black w-full ${
@@ -166,10 +168,10 @@ const Login = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)} 
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-3 text-gray-400"
               >
-                {showPassword ? <FaEyeSlash /> : <FaEye />} 
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
