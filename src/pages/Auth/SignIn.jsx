@@ -35,8 +35,9 @@ const SignIn = () => {
   const [apiError, setApiError] = useState("");
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user) {
+    const user = localStorage.getItem("user");
+    if (user && user !=="undefined") {
+      const userData=JSON.parse(user);
       navigate("/home");
     }
   }, [navigate]);

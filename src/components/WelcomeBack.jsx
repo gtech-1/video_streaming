@@ -7,14 +7,24 @@ const WelcomeBack = () => {
     if (!str) return "";
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
+// Get user details from localStorage
+const userDetails = localStorage.getItem("user");
+console.log(userDetails, "userDetails");
 
-  // Get user details from localStorage
-  const userDetails = localStorage.getItem("user");
-  const userData = userDetails ? JSON.parse(userDetails) : null;
+let userData = null;
 
-  // Get first name and last name, with formatting
-  const firstName = capitalize(userData?.firstName || "");
-  const lastName = capitalize(userData?.lastName || "");
+if (userDetails && userDetails !== "undefined") {
+  try {
+    userData = JSON.parse(userDetails);
+  } catch (e) {
+    console.error("Failed to parse user data from localStorage:", e);
+  }
+}
+
+// Get first name and last name, with formatting
+const firstName = capitalize(userData?.firstName || "");
+const lastName = capitalize(userData?.lastName || "");
+
 
   return (
     <div

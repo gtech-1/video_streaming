@@ -640,7 +640,9 @@ function ProfilePage() {
     const fetchProfileData = async () => {
       try {
         const response = await authAPI.getProfile();
+        console.log("Profile data fetched:", response.data);
         setProfileData(response.data);
+
       } catch (error) {
         setError(error.response?.data?.error || "Failed to fetch profile data");
         if (error.response?.status === 401) {
