@@ -8,6 +8,9 @@ export const AuthProvider = ({ children, value }) => {
  useEffect(() => {
     const storedUser = localStorage.getItem("user");
     console.log("Stored user:", storedUser);
+    if(!storedUser){
+      return;
+    }
 
     if (storedUser && storedUser !== "undefined") {
       try {

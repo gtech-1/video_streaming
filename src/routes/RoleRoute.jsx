@@ -8,11 +8,11 @@ const RoleRoute = ({ allowedRoles, children, fallback }) => {
   console.log("RoleRoute user:", user);
   if (!user) return <Navigate to="/login" replace />; // Not logged in
 
-  if (allowedRoles.includes(user.role)) {
+  if (allowedRoles.includes(user?.userType)) {
     return <>{children}</>; 
   }
 
-  return fallback || <Navigate to="/home" replace />; // Unauthorized
+  return fallback || <Navigate to="/" replace />; 
 };
 
 export default RoleRoute;
