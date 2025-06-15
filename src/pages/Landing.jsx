@@ -74,7 +74,7 @@ const Landing = () => {
       <motion.nav
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, transition: { duration: 0.5 } }}
-        className="sticky top-0 z-50 bg-gray-900 shadow-lg px-4 sm:px-6 md:px-8 lg:px-16 py-3 sm:py-4 flex justify-between items-center text-white"
+        className="fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-lg px-4 sm:px-6 md:px-8 lg:px-16 py-3 sm:py-4 flex justify-between items-center text-white"
       >
         <div className="text-xl sm:text-2xl font-bold">YourLMS</div>
         
@@ -83,9 +83,9 @@ const Landing = () => {
           <button onClick={() => scrollToSection(heroRef, true)} className="hover:text-blue-400 transition">
             Home
           </button>
-          <button onClick={() => scrollToSection(dashboardRef, true)} className="hover:text-blue-400 transition">
+          {/* <button onClick={() => scrollToSection(dashboardRef, true)} className="hover:text-blue-400 transition">
             Dashboard
-          </button>
+          </button> */}
           <button onClick={() => scrollToSection(coursesRef, true)} className="hover:text-blue-400 transition">
             Courses
           </button>
@@ -102,7 +102,7 @@ const Landing = () => {
             Connect
           </button>
           <button
-            onClick={() => navigate("/signin")}
+            onClick={() => navigate("/signUp")}
             className="border border-white text-white px-4 py-2 rounded hover:bg-gray-800 transition"
           >
             Sign Up
@@ -134,7 +134,7 @@ const Landing = () => {
           <button onClick={() => scrollToSection(communityRef)} className="block w-full py-2 text-left hover:text-blue-400 transition">Community</button>
           <button onClick={() => scrollToSection(testimonialsRef)} className="block w-full py-2 text-left hover:text-blue-400 transition">Testimonials</button>
           <button onClick={() => scrollToSection(ctaRef)} className="block w-full py-2 text-left hover:text-blue-400 transition">Connect</button>
-          <button onClick={() => navigate("/signin")} className="block w-full py-2 text-left border-t border-gray-700 pt-2 mt-2 hover:text-blue-400">Sign Up</button>
+          <button onClick={() => navigate("/signUp")} className="block w-full py-2 text-left border-t border-gray-700 pt-2 mt-2 hover:text-blue-400">Sign Up</button>
         </div>
       </motion.div>
 
@@ -186,7 +186,7 @@ const Landing = () => {
           Get Started
         </button> */}
         <button
-         onClick={() => navigate("/signin")}
+         onClick={() => navigate("/signUp")}
           className="px-8 py-3 bg-[#111827] text-white rounded-full hover:bg-gray-800 transition text-base sm:text-lg shadow-lg"
            >
           Get Started
@@ -346,7 +346,7 @@ const Landing = () => {
               Join thousands of learners in an LMS designed to empower, engage, and elevate your academic and professional journey.
             </p>
             <button
-  onClick={() => navigate("/signin")}
+  onClick={() => navigate("/signUp")}
   className="mt-2 sm:mt-4 px-6 py-2 sm:px-8 sm:py-4 bg-[#111827] text-white rounded-full hover:bg-gray-800 transition text-sm sm:text-base"
 >
   Get Started
