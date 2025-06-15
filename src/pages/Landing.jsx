@@ -101,12 +101,39 @@ const Landing = () => {
           <button onClick={() => scrollToSection(ctaRef, true)} className="hover:text-blue-400 transition">
             Connect
           </button>
+
           <button
             onClick={() => navigate("/signUp")}
             className="border border-white text-white px-4 py-2 rounded hover:bg-gray-800 transition"
           >
             Sign Up
           </button>
+          <button
+            onClick={() => navigate("/login")}
+            className="border border-white text-white px-4 py-2 rounded hover:bg-gray-800 transition"
+          >
+            Login
+          </button> */}
+
+
+
+<button
+  onClick={() => navigate("/signUp")}
+  className="rounded-full px-6 py-2 bg-white text-[#2D2638] font-semibold hover:bg-gray-200 transition"
+>
+  Sign Up
+</button>
+<button
+  onClick={() => navigate("/login")}
+  className="rounded-full px-6 py-2 border border-white text-white font-semibold hover:bg-white hover:text-[#2D2638] transition"
+>
+  Login
+</button>
+
+
+
+
+
         </div>
         
         {/* Mobile Hamburger - Changed breakpoint from lg to xl */}
