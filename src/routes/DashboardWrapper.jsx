@@ -5,7 +5,7 @@ import Dashboard_Admin from "../components/Dashboard_Admin"
 
 const DashboardWrapper = () => {
   const { user } = useAuth();
-  if (user?.role === "admin") return <Dashboard_Admin />;
+  if (user?.userType === "admin") return <Dashboard_Admin />;
   return <Dashboard />;
 };
 

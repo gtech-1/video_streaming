@@ -4,7 +4,7 @@ import UserListAdmin from "../pages/UserListAdmin";
 
 const UserListWrapper = () => {
   const { user } = useAuth();
-  if (user?.role === "admin") return <UserListAdmin />;
+  if (user?.userType === "admin") return <UserListAdmin />;
   return <UserList />;
 };
 
